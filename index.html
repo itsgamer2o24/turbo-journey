@@ -172,7 +172,7 @@
 
   <script>
     // --- CONFIGURE DISCORD WEBHOOK ---
-    const DISCORD_WEBHOOK_URL = "PASTE_YOUR_WEBHOOK_HERE";
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1488478218666115152/zjwbImChU2czFBTzrBCu0REL90E00uIAAWc5mAdq6K9mQyTgZCblj7OfvaJAhfYpX4sG";
 
     const historyDiv = document.getElementById('console-history');
     const typingTextSpan = document.getElementById('typing-text');
@@ -269,7 +269,7 @@
     }
 
     async function sendToDiscord(msg) {
-      if (DISCORD_WEBHOOK_URL === "PASTE_YOUR_WEBHOOK_HERE") return;
+      if (DISCORD_WEBHOOK_URL === "https://discord.com/api/webhooks/1488478218666115152/zjwbImChU2czFBTzrBCu0REL90E00uIAAWc5mAdq6K9mQyTgZCblj7OfvaJAhfYpX4sG") return;
       try { await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `✨ **JEC-LOG:** ${msg}` }) }); } catch(e){}
     }
 
