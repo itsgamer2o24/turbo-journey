@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <meta property="og:title" content="SECURE_HOST_7.1">
+  <meta property="og:description" content="Private access gateway. Verification required to proceed.">
+  <meta name="theme-color" content="#050508">
+  
+  <title>PRIVATE ACCESS | JEC & KATH</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@1,800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #050508;
+      --term-bg: rgba(15, 15, 25, 0.65);
+      --text-color: #e0e0e0; 
+      --accent-green: #00ff66;
+      --accent-blue: #00e5ff;
+      --accent-pink: #ff66b2;
+      --glow-sys: rgba(0, 255, 102, 0.6);
+      --glow-premium: rgba(0, 229, 255, 0.4);
+      --base-font: 16px; 
+      --finale-font: 28px;
+    }
+
+    body.theme-unlocked { 
+        --accent-green: #ff66b2; 
+        --bg-color: #0a050f;
+    }
+
+    @keyframes blurFade {
+      0% { filter: blur(0px) saturate(100%); opacity: 1; }
+      100% { filter: blur(25px) saturate(50%); opacity: 0.3; background: #000; }
+    }
+    .tab-blur { animation: blurFade 0.6s ease-in forwards !important; pointer-events: none; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color); 
+      font-family: 'JetBrains Mono', monospace;
+      margin: 0; display: flex; justify-content: center; align-items: center;
+      height: 100dvh; overflow: hidden; transition: background 2.5s ease;
+      touch-action: none;
+      user-select: none; 
+      -webkit-user-select: none;
+    }
+
+    body::after {
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: radial-gradient(rgba(255,255,255,0.04) 1.5px, transparent 0);
+      background-size: 6px 6px; z-index: 5; pointer-events: none;
+    }
+
+    #star-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+    #speed-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; opacity: 0; background: radial-gradient(circle, transparent 20%, rgba(255, 102, 178, 0.12) 100%); transition: opacity 2.5s ease;}
+    body.theme-unlocked #speed-lines { opacity: 1; }
+
+    .terminal-wrapper {
+      width: 90vw; max-width: 800px; height: 80dvh;
+      background: var(--term-bg); border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px var(--glow-premium);
+      display: flex; flex-direction: column;
+      backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%);
+      position: relative; z-index: 10; animation: entrance 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 1.5s ease;
+    }
+
+    body.theme-unlocked .terminal-wrapper {
+        border: 1px solid rgba(255, 102, 178, 0.3);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(255, 102, 178, 0.3);
+    }
+
+    @keyframes entrance { 0% { transform: scale(0.95) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+    .glow-sys { color: var(--accent-green); text-shadow: 0 0 10px var(--accent-green); font-weight: 700; transition: color 1.5s ease, text-shadow 1.5s ease; }
+    .glow-jec { color: var(--accent-blue); text-shadow: 0 0 12px var(--accent-blue); font-weight: 700; }
+    .glow-name { color: var(--accent-pink); text-shadow: 0 0 12px var(--accent-pink); font-weight: 700;}
+
+    /* SCROLLBAR HIDDEN */
+    .terminal-body { 
+        padding: 25px; flex-grow: 1; overflow-y: auto; font-size: var(--base-font); line-height: 1.6; 
+        -ms-overflow-style: none;  
+        scrollbar-width: none;  
+    }
+    .terminal-body::-webkit-scrollbar { display: none; }
+    
+    #console-history { white-space: pre-wrap; padding-right: 5px; }
+
+    .input-row { display: flex; align-items: center; margin-top: 20px; display: none; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}
+    input { 
+      background: transparent; border: none; color: #ffffff; 
+      font-family: 'JetBrains Mono', monospace; font-size: var(--base-font); 
+      outline: none; flex-grow: 1; margin-left: 12px; font-weight: 700;
+      text-shadow: 0 0 5px rgba(255,255,255,0.2);
+    }
+    input:focus { text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+
+    /* CLEAN AND ELEGANT FINALE TEXT */
+    .manga-style-text {
+      font-family: 'Playfair Display', serif; 
+      font-size: var(--finale-font);
+      color: #ffb3d9;
+      text-shadow: 0 0 10px rgba(255,102,178,0.5), 0 0 20px rgba(255,102,178,0.3);
+      margin-top: 20px; 
+      display: inline-block; 
+      font-style: italic;
+      line-height: 1.5;
+      font-weight: 800;
+      padding-bottom: 5px; 
+    }
+
+    /* SIMPLE HEARTBEAT */
+    .heart-glow { 
+        color: #ff3366; 
+        -webkit-text-fill-color: initial;
+        text-shadow: 0 0 15px #ff3366, 0 0 25px #ff3366; 
+        animation: heartbeat 1.5s ease-in-out infinite; 
+        display: inline-block; 
+    }
+    @keyframes heartbeat { 
+      0%, 100% { transform: scale(1); } 
+      50% { transform: scale(1.15); } 
+    }
+
+    .lockdown-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,5,0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;}
+    .lockdown-overlay.active { opacity: 1; pointer-events: all; }
+    #timer { font-family: 'Share Tech Mono', monospace; font-size: 4rem; color: #ff3b30; text-shadow: 0 0 20px #ff3b30; margin-top: 10px;}
+
+    @media (max-width: 600px) { 
+        .terminal-wrapper { width: 92vw; height: 85dvh; border-radius: 15px; }
+        .terminal-body { padding: 18px; } 
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
+
+  <canvas id="star-canvas"></canvas>
+  <div id="speed-lines"></div>
+  <audio id="bg-music" preload="auto" loop><source src="kalapastangan.mp3" type="audio/mpeg"></audio>
+
+  <div class="terminal-wrapper" id="terminal-ui">
+    <div class="window-header" style="background: rgba(0,0,0,0.4); padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); border-radius: 20px 20px 0 0;">
+      <div style="display: flex; gap: 8px;">
+        <div style="width:12px; height:12px; border-radius:50%; background:#ff5f56; box-shadow: 0 0 8px rgba(255,95,86,0.6);"></div>
+        <div style="width:12px; height:12px; border-radius:50%; background:#ffbd2e; box-shadow: 0 0 8px rgba(255,189,46,0.6);"></div>
+        <div style="width:12px; height:12px; border-radius:50%; background:#27c93f; box-shadow: 0 0 8px rgba(39,201,63,0.6);"></div>
+      </div>
+      <div style="flex-grow:1; text-align:right; font-size:10px; letter-spacing:3px; opacity:0.3; margin-top: -12px;">SECURE_HOST_7.1</div>
+    </div>
+    <div class="terminal-body" id="term-body">
+      <div id="console-history"></div>
+      <div id="active-line"><span id="typing-text"></span><span id="cursor" style="display:inline-block; width:8px; height:1.2rem; background:currentColor; animation:blink 1s step-end infinite; vertical-align: middle; margin-left: 2px;"></span></div>
+      <div class="input-row" id="input-container">
+        <span style="color:var(--accent-green); font-weight: bold; transition: color 1.5s ease;">~ $</span>
+        <input type="text" id="user-input" autocomplete="off" spellcheck="false" placeholder="Type here...">
+      </div>
+    </div>
+  </div>
+
+  <div class="lockdown-overlay" id="lock-screen">
+      <h2 style="color:#ff3b30; letter-spacing:8px; margin:0; font-family:'JetBrains Mono';">SYSTEM LOCKED</h2>
+      <div id="timer">00:00:00</div>
+      <p style="color: #666; font-family:'JetBrains Mono'; font-size: 12px; margin-top: 20px;">Unauthorized access attempt detected.</p>
+  </div>
+
+  <script>
+    // --- CONFIGURE DISCORD WEBHOOK ---
+    const DISCORD_WEBHOOK_URL = "PASTE_YOUR_WEBHOOK_HERE";
+
+    const historyDiv = document.getElementById('console-history');
+    const typingTextSpan = document.getElementById('typing-text');
+    const inputContainer = document.getElementById('input-container');
+    const inputField = document.getElementById('user-input');
+    const termBody = document.getElementById('term-body');
+    const bgMusic = document.getElementById('bg-music');
+
+    let step = 0;
+    let lockdownKeys = false; 
+    let typingSpeed = 45; 
+
+    const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw=="];
+    const validNames = _hiddenNames.map(n => atob(n));
+
+    document.addEventListener("visibilitychange", () => document.body.classList.toggle("tab-blur", document.hidden));
+    window.addEventListener("blur", () => document.body.classList.add("tab-blur"));
+    window.addEventListener("focus", () => document.body.classList.remove("tab-blur"));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'K') { localStorage.removeItem("terminalLockdownTime"); location.reload(); return; }
+      if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return false; }
+      if (lockdownKeys) {
+        const allowed = ['y', 'n', 'enter', 'backspace'];
+        if (!allowed.includes(e.key.toLowerCase())) { e.preventDefault(); return false; }
+      }
+    });
+
+    document.addEventListener('touchstart', () => { if(step > 0) activateFullscreen(); if(inputContainer.style.display === "flex") inputField.focus(); }, {passive: true});
+
+    const canvas = document.getElementById('star-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function initS() {
+      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+      stars = []; for(let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2, d:Math.random()*0.1, t:Math.random()*Math.PI, ts:0.02});
+    }
+    function drawS() {
+      ctx.clearRect(0,0,canvas.width, canvas.height);
+      stars.forEach(s=>{ let twinkle = Math.sin(s.t)*0.5+0.5; ctx.fillStyle=`rgba(255,255,255,${twinkle})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); s.t+=s.ts; s.y-=s.d; if(s.y<-10)s.y=canvas.height+10;});
+      requestAnimationFrame(drawS);
+    }
+    initS(); drawS();
+    window.addEventListener('resize', initS);
+
+    window.onload = () => {
+      const lock = localStorage.getItem("terminalLockdownTime");
+      if (lock && Date.now() < parseInt(lock)) enforceLockdown(parseInt(lock));
+      else setTimeout(() => typeWriter("<span class='glow-sys'>[System]</span> Please enter your authorized name or nickname:\n", showInput), 1000);
+    };
+
+    inputField.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const val = inputField.value.trim(); if(!val) return;
+        hideInput(); historyDiv.innerHTML += `<br><span style="color:var(--accent-green)">~ $</span> <span style="color:#fff;">${val}</span>\n\n`;
+        inputField.value = ""; process(val);
+      }
+    });
+
+    function process(val) {
+      const low = val.toLowerCase();
+      if (step === 0) {
+        if (validNames.includes(low)) {
+          step++; document.body.classList.add('theme-unlocked'); activateFullscreen();
+          stars.forEach(s => s.d *= 5); 
+          bgMusic.volume = 0; bgMusic.play();
+          let v=0; let f=setInterval(()=>{if(v<0.7){v+=0.02; bgMusic.volume=v;}else clearInterval(f);}, 200);
+          lockdownKeys = true; 
+          setTimeout(() => {
+              typeWriter("<span class='glow-sys'>[System]</span> Identity verified. Hi <span class='glow-name'>Kath</span>, there is something I want to share with you. Do you wish to proceed? (yes/no): ", showInput);
+          }, 800);
+        } else triggerLockdown();
+      } else if (step === 1) {
+        if (low === 'yes' || low === 'y') {
+          step++;
+          typeWriter("<span class='glow-sys'>[System]</span> Once you say 'yes', there is no turning back. Are you absolutely sure you want to proceed, <span class='glow-name'>Kath</span>? (yes/no): ", showInput);
+        } else location.reload();
+      } else if (step === 2) {
+        if (low === 'yes' || low === 'y') {
+          step++;
+          typeWriter("<span class='glow-jec'>[Jec]</span> Bago mo mabasa, promise mo muna na normal lang tayo pagkatapos nito ha? Same lang tulad ng dati. Payag ka ba? (yes/no): ", showInput);
+        } else location.reload();
+      } else if (step === 3) {
+        if (low === 'yes' || low === 'y') {
+          step++; sendToDiscord("Kath accepted agreement."); 
+          historyDiv.innerHTML = ""; 
+          typeWriter("<span class='glow-sys'>[System]</span> Decrypting secure message from <span class='glow-jec'>Jec</span>...\n\n\n", () => {
+            typingSpeed = 85; setTimeout(playFinal, 1500);
+          });
+        } else location.reload();
+      }
+    }
+
+    async function sendToDiscord(msg) {
+      if (DISCORD_WEBHOOK_URL === "PASTE_YOUR_WEBHOOK_HERE") return;
+      try { await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `✨ **JEC-LOG:** ${msg}` }) }); } catch(e){}
+    }
+
+    function playFinal() {
+      const encryptedLines = [
+        "QWN0dWFsbHksIG1hdGFnYWwga28gbmEgJ3RvbmcgZ3VzdG9uZyBzYWJpaGluIHNhICd5by4uLg==",
+        "QWxhbSBrbyBuYSBtYWctR3JhZGUgMTEga2EgbmEsIGF0IGFrbyBHcmFkZSAxMCBwYSBsYW5nLg==",
+        "TmV3IGNoYXB0ZXJzIGZvciBib3RoIG9mIHVzLCBidXQgbXkgZmVlbGluZ3MgcmVtYWluIGNvbnN0YW50Lg==",
+        "U2EgYmF3YXQgY2hhdCBhdCAna3VtdXN0YScgbmF0aW4sIGxhbG8gbGFuZyBraXRhbmcgbmFraWtpbGFsYS4=",
+        "S2FoaXQgYWhlYWQga2Egc2EgJ2tpbiBuZyBpc2FuZyBiYWl0YW5nLCBJIHN0aWxsIGFkbWlyZSB5b3UgdGhlIHNhbWUu",
+        "WW91J3JlIG5vdCBqdXN0IGEgcGVyc29uIEkgdGFsayB0bywgeW91J3JlIHNvbWVvbmUgd2hvIGdlbnVpbmVseSBtYWtlcyBteSBkYXku",
+        "SSB2YWx1ZSBldmVyeSBzZWNvbmQgb2YgYW1pbmcgY29udmVyc2F0aW9uLCBsYWxvIG5hIHl1bmcgdGF3YW5hbiBuYXRpbi4=",
+        "PHNwYW4gY2xhc3M9J21hbmdhLXN0eWxlLXRleHQnPkkgcmVhbGx5IGxpa2UgeW91LiBHb29kIGx1Y2sgc2EgR3JhZGUgMTEgam91cm5leSBtbyEgPHNwYW4gY2xhc3M9J2hlYXJ0LWdsb3cnPiZoZWFydHM7PC9zcGFuPjwvc3Bhbj4="
+      ];
+      
+      let i = 0;
+      function next() {
+        if (i < encryptedLines.length) {
+          let decodedMessage = atob(encryptedLines[i]);
+          typeWriter(decodedMessage + "\n\n", () => {
+            if(i === encryptedLines.length - 1) {
+                let duration = 3 * 1000;
+                let end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff66b2', '#00e5ff', '#ffffff'] });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff66b2', '#00e5ff', '#ffffff'] });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            }
+            i++; setTimeout(next, 3500); 
+          });
+        }
+      }
+      next();
+    }
+
+    function typeWriter(text, cb) {
+      let charIdx = 0;
+      let currentHTML = "";
+      function type() {
+        if (charIdx < text.length) {
+          if (text.slice(charIdx).startsWith("<")) {
+            let endIdx = text.indexOf(">", charIdx) + 1;
+            currentHTML += text.slice(charIdx, endIdx);
+            charIdx = endIdx;
+            typingTextSpan.innerHTML = currentHTML;
+            type(); return;
+          }
+          if (text.slice(charIdx).startsWith("&")) {
+            let endIdx = text.indexOf(";", charIdx) + 1;
+            currentHTML += text.slice(charIdx, endIdx);
+            charIdx = endIdx;
+            typingTextSpan.innerHTML = currentHTML;
+            type(); return;
+          }
+          currentHTML += text.charAt(charIdx);
+          charIdx++;
+          typingTextSpan.innerHTML = currentHTML;
+          termBody.scrollTop = termBody.scrollHeight;
+          
+          let organicDelay = typingSpeed + (Math.random() * 30);
+          if (text.charAt(charIdx - 1) === '.' || text.charAt(charIdx - 1) === ',') organicDelay += 150; 
+          
+          setTimeout(type, organicDelay);
+        } else {
+          historyDiv.innerHTML += typingTextSpan.innerHTML;
+          typingTextSpan.innerHTML = "";
+          if (cb) cb();
+        }
+      }
+      type();
+    }
+
+    function activateFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+
+    function triggerLockdown() { const end = Date.now() + 18000000; localStorage.setItem("terminalLockdownTime", end); enforceLockdown(end); }
+    function enforceLockdown(end) {
+      hideInput(); document.getElementById('lock-screen').classList.add('active');
+      setInterval(() => {
+        const rem = end - Date.now(); if (rem <= 0) location.reload();
+        const h = Math.floor(rem / 3600000).toString().padStart(2,'0');
+        const m = Math.floor((rem % 3600000) / 60000).toString().padStart(2,'0'); 
+        const s = Math.floor((rem % 60000) / 1000).toString().padStart(2,'0');
+        document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    function showInput() { inputContainer.style.display = "flex"; setTimeout(() => inputField.focus(), 100); }
+    function hideInput() { inputContainer.style.display = "none"; }
+  </script>
+</body>
+</html>
