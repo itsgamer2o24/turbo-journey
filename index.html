@@ -52,7 +52,7 @@
     }
     .system-blur * { opacity: 0 !important; }
 
-    /* OPTION 9: Custom Hacker Cursor */
+    /* Custom Hacker Cursor */
     body, input, .window-btn {
       cursor: crosshair !important;
     }
@@ -84,6 +84,14 @@
         opacity: 0 !important; transition: filter 0.05s, opacity 0.05s;
     }
 
+    /* Red "Access Denied" Flash Overlay */
+    #flash-overlay { 
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+        background: #ff0000; z-index: 9999999; opacity: 0; pointer-events: none; 
+    }
+    .flash-active { animation: flashRed 0.4s ease-out forwards; }
+    @keyframes flashRed { 0% { opacity: 0.9; } 100% { opacity: 0; } }
+
     #matrix-canvas {
         position: fixed; top: -25vh; left: -25vw; width: 150vw; height: 150vh;
         z-index: 0; pointer-events: none; opacity: 0.25; display: block; will-change: transform;
@@ -98,7 +106,7 @@
     }
     @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.15); } }
 
-    /* OPTION 5: Anime Silhouette Easter Egg */
+    /* Anime Silhouette Easter Egg */
     #anime-silhouette {
         position: fixed; bottom: -5vh; right: -5vw; width: 50vw; height: 70vh;
         /* Replace this URL with any direct image link of a silhouette or character */
@@ -108,7 +116,7 @@
         filter: grayscale(100%) brightness(0) drop-shadow(0 0 10px var(--neon-pink));
     }
     body.theme-unlocked #anime-silhouette { 
-        opacity: 0.12; /* Faintly visible */
+        opacity: 0.12; 
         filter: grayscale(100%) brightness(0.5) drop-shadow(0 0 20px var(--neon-pink));
     }
 
@@ -212,15 +220,25 @@
     .input-row { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; display: none; }
     .input-arrow { color: var(--accent-green); font-weight: bold; margin-right: 15px; font-size: 18px; text-shadow: 0 0 8px var(--accent-green); }
     
+    /* Music-Reactive Input Box */
     input { 
         background: rgba(0,0,0,0.5); padding: 14px 20px; border-radius: 10px; 
         border: 1px solid rgba(255,255,255,0.15); color: #ffffff; 
         font-family: 'JetBrains Mono', monospace; font-size: 16px; outline: none; 
-        flex-grow: 1; font-weight: 700; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); 
-        transition: all 0.3s ease; letter-spacing: 0.5px;
+        flex-grow: 1; font-weight: 700; transition: border 0.3s ease, background 0.3s ease; letter-spacing: 0.5px;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(var(--audio-pulse) * 20px) rgba(0,255,102,0.3); 
     }
-    input:focus { border: 1px solid var(--accent-green); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,255,102,0.3); background: rgba(0,0,0,0.7); }
-    body.theme-unlocked input:focus { border: 1px solid var(--accent-pink); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 15px rgba(255,102,178,0.3); }
+    input:focus { 
+        border: 1px solid var(--accent-green); background: rgba(0,0,0,0.7);
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(15px + (var(--audio-pulse) * 40px)) rgba(0,255,102,calc(0.3 + var(--audio-pulse))); 
+    }
+    body.theme-unlocked input {
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(var(--audio-pulse) * 20px) rgba(255,102,178,0.3); 
+    }
+    body.theme-unlocked input:focus { 
+        border: 1px solid var(--accent-pink); 
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(15px + (var(--audio-pulse) * 40px)) rgba(255,102,178,calc(0.3 + var(--audio-pulse))); 
+    }
     input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; font-style: italic; }
 
     .manga-style-text {
@@ -270,12 +288,13 @@
         .input-row { margin-top: 10px; }
         input { padding: 12px 15px; font-size: 14px; }
         .manga-style-text { font-size: 24px; }
-        #anime-silhouette { width: 70vw; height: 50vh; opacity: 0.08; } /* Adjusted for mobile */
+        #anime-silhouette { width: 70vw; height: 50vh; opacity: 0.08; }
     }
   </style>
 </head>
 <body>
 
+  <div id="flash-overlay"></div>
   <div id="privacy-shield"></div>
 
   <canvas id="matrix-canvas"></canvas>
@@ -355,6 +374,22 @@
                 source.connect(analyser); analyser.connect(audioCtx.destination);
                 analyser.fftSize = 128; dataArray = new Uint8Array(analyser.frequencyBinCount);
             } catch(e) { console.log("Audio visualizer disabled."); }
+        }
+
+        // OPTION 7: Access Granted Sci-Fi Chime
+        function playAccessGrantedSound() {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch start
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            } catch(e) {}
         }
 
         function forceUnlockAudio() {
@@ -479,6 +514,9 @@
               
               // OPTION 3: Haptic vibration on verified identity
               if (navigator.vibrate) navigator.vibrate(50);
+              
+              // OPTION 7: Play Access Granted Chime
+              playAccessGrantedSound();
 
               if (favicon) favicon.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>";
               if (bgMusic) { 
@@ -780,7 +818,12 @@
         window.addEventListener('resize', () => { initMatrix(); initC(); });
         initC(); drawC();
 
-        function triggerLockdown() { const end = Date.now() + 18000000; safeSetLock(end); enforceLockdown(end); }
+        // OPTION 10: Red Access Denied Flash added to Lockdown Trigger
+        function triggerLockdown() { 
+            document.getElementById('flash-overlay').classList.add('flash-active');
+            const end = Date.now() + 18000000; safeSetLock(end); enforceLockdown(end); 
+        }
+
         function enforceLockdown(end) {
           hideInput(); document.getElementById('lock-screen').classList.add('active');
           const timerInterval = setInterval(() => {
