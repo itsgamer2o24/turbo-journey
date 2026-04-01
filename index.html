@@ -24,7 +24,7 @@
       --nebula-color: rgba(0, 229, 255, 0.04);
       --grid-color: rgba(0, 229, 255, 0.15);
       
-      --term-bg: rgba(10, 12, 20, 0.65); 
+      --term-bg: rgba(7, 7, 12, 0.75); 
       --text-color: #e0e0e0; 
       
       --neon-cyan: #00e5ff;
@@ -44,7 +44,6 @@
         --accent-green: var(--neon-pink); 
     }
 
-    /* EXTREME PRIVACY BLUR */
     .system-blur {
         filter: blur(80px) brightness(0.0) grayscale(100%) !important;
         transition: filter 0.1s ease;
@@ -63,7 +62,6 @@
       perspective: 1000px; 
     }
 
-    /* PRIVACY SHIELD BLACKOUT */
     #privacy-shield {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background-color: #000000; z-index: 9999999; opacity: 0; pointer-events: none;
@@ -81,13 +79,11 @@
         opacity: 0 !important; transition: filter 0.05s, opacity 0.05s;
     }
 
-    /* MATRIX DIGITAL RAIN */
     #matrix-canvas {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        z-index: 0; pointer-events: none; opacity: 0.25; display: block;
+        position: fixed; top: -25vh; left: -25vw; width: 150vw; height: 150vh;
+        z-index: 0; pointer-events: none; opacity: 0.25; display: block; will-change: transform;
     }
 
-    /* NEBULA */
     .nebula {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: radial-gradient(circle at 20% 30%, var(--nebula-color) 0%, transparent 50%),
@@ -97,18 +93,16 @@
     }
     @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.15); } }
 
-    /* 3D CYBER GRID */
     .cyber-grid {
-        position: fixed; bottom: -10%; left: -50%; width: 200%; height: 45vh;
+        position: fixed; bottom: -20vh; left: -100vw; width: 300vw; height: 60vh;
         background: linear-gradient(var(--grid-color) 1px, transparent 1px),
                     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-        background-size: 40px 40px; transform: perspective(600px) rotateX(70deg);
+        background-size: 40px 40px; transform: perspective(600px) rotateX(75deg);
         animation: gridMove 5s linear infinite;
         z-index: 1; opacity: 0.8; pointer-events: none; transition: background 2s ease;
     }
-    @keyframes gridMove { 0% { transform: perspective(600px) rotateX(70deg) translateY(0); } 100% { transform: perspective(600px) rotateX(70deg) translateY(40px); } }
+    @keyframes gridMove { 0% { transform: perspective(600px) rotateX(75deg) translateY(0); } 100% { transform: perspective(600px) rotateX(75deg) translateY(40px); } }
 
-    /* CRT SCANLINES */
     .scanlines {
         position: fixed; top: -25%; left: -25%; width: 150vw; height: 150vh; 
         background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15));
@@ -127,7 +121,6 @@
 
     .terminal-container { position: relative; z-index: 10; animation: entrance 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform; }
 
-    /* AUDIO-REACTIVE BORDER */
     .terminal-container::before {
         content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
         background: linear-gradient(45deg, var(--accent-blue), transparent 30%, transparent 70%, var(--accent-pink));
@@ -139,7 +132,6 @@
     body.theme-unlocked .terminal-container::before { background: linear-gradient(45deg, var(--accent-pink), transparent 30%, transparent 70%, #fff); }
     @keyframes borderRotate { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
-    /* REFINED TERMINAL UI */
     .terminal-wrapper {
       width: 92vw; max-width: 800px; height: 82dvh;
       background: var(--term-bg); border-radius: 20px;
@@ -198,7 +190,6 @@
     body.theme-unlocked #cursor { background: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    /* PERFECTED INPUT UI */
     .input-row { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; display: none; }
     .input-arrow { color: var(--accent-green); font-weight: bold; margin-right: 15px; font-size: 18px; text-shadow: 0 0 8px var(--accent-green); }
     
@@ -304,18 +295,15 @@
   <div class="lockdown-overlay" id="lock-screen"><div id="timer">00:00:00</div></div>
 
   <script>
-    function bootloader() {
-        if (window.appBooted) return;
-        window.appBooted = true;
-        runApp();
-    }
-    
-    setTimeout(() => {
-        if (document.readyState === 'complete' || document.readyState === 'interactive') { bootloader(); } 
-        else { document.addEventListener('DOMContentLoaded', bootloader); window.addEventListener('load', bootloader); }
-    }, 150);
+    // --- MASTER EXECUTION LOCK ---
+    // This absolutely guarantees the code can only run ONE time, 
+    // preventing the "repeating text" glitch on mobile browsers.
+    let isAppRunning = false;
 
     function runApp() {
+        if (isAppRunning) return; // Instantly kill duplicate triggers
+        isAppRunning = true;
+
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1488478218666115152/zjwbImChU2czFBTzrBCu0REL90E00uIAAWc5mAdq6K9mQyTgZCblj7OfvaJAhfYpX4sG";
         const historyDiv = document.getElementById('console-history');
         const typingTextSpan = document.getElementById('typing-text');
@@ -328,6 +316,7 @@
         if (!historyDiv || !typingTextSpan) return;
 
         let step = 0; let lockdownKeys = false; let typingSpeed = 45; 
+        let isTyping = false; // Secondary lock to prevent overlap during text generation
 
         // --- AUDIO VISUALIZER SETUP ---
         let audioCtx, analyser, dataArray;
@@ -548,7 +537,7 @@
                                 opTimerDisplay.style.color = "#00ff66";
                                 opTimerDisplay.style.textShadow = "0 0 20px #00ff66";
                                 document.body.classList.remove('theme-unlocked');
-                                window.onbeforeunload = null;
+                                window.onbeforeunload = null; // Release the exit lock
                             }
                         }, 1000);
                         
@@ -560,6 +549,9 @@
         }
 
         function typeWriter(text, cb) {
+          if (isTyping) return; // Double protection against parallel typing
+          isTyping = true;
+          
           let charIdx = 0; let currentHTML = "";
           function type() {
             if (charIdx < text.length) {
@@ -586,13 +578,14 @@
               setTimeout(type, delay);
             } else {
               historyDiv.innerHTML += typingTextSpan.innerHTML; typingTextSpan.innerHTML = "";
+              isTyping = false; // Release lock
               if (cb) cb();
             }
           }
           type();
         }
 
-        // --- MATRIX RAIN LOGIC ---
+        // --- MATRIX RAIN LOGIC (FIXED EDGE CUTOFF) ---
         const matrixCanvas = document.getElementById('matrix-canvas');
         const mCtx = matrixCanvas ? matrixCanvas.getContext('2d') : null;
         let matrixDrops = [];
@@ -600,8 +593,8 @@
 
         function initMatrix() {
             if (!matrixCanvas) return;
-            matrixCanvas.width = window.innerWidth || document.documentElement.clientWidth;
-            matrixCanvas.height = window.innerHeight || document.documentElement.clientHeight;
+            matrixCanvas.width = window.innerWidth * 1.5;
+            matrixCanvas.height = window.innerHeight * 1.5;
             const columns = Math.floor(matrixCanvas.width / matrixFontSize) + 1;
             matrixDrops = [];
             for(let x = 0; x < columns; x++) matrixDrops[x] = Math.random() * -100; 
@@ -647,10 +640,8 @@
         function initC() {
           if (!starCanvas || !netCanvas) return;
           
-          let w = window.innerWidth || document.documentElement.clientWidth;
-          let h = window.innerHeight || document.documentElement.clientHeight;
-          starCanvas.width = netCanvas.width = w * 1.5; 
-          starCanvas.height = netCanvas.height = h * 1.5;
+          starCanvas.width = netCanvas.width = window.innerWidth * 1.5; 
+          starCanvas.height = netCanvas.height = window.innerHeight * 1.5;
           
           stars = []; netNodes = []; dust = []; const isMobile = window.innerWidth < 600;
           
@@ -758,8 +749,13 @@
         function hideInput() { inputContainer.style.display = "none"; }
     }
 
-    if (document.readyState === 'complete' || document.readyState === 'interactive') { setTimeout(runApp, 150); } 
-    else { document.addEventListener('DOMContentLoaded', runApp); window.addEventListener('load', runApp); }
+    // Safely trigger ONLY ONE TIME
+    if (document.readyState === 'complete' || document.readyState === 'interactive') { 
+        setTimeout(runApp, 100); 
+    } else { 
+        document.addEventListener('DOMContentLoaded', runApp); 
+        window.addEventListener('load', runApp); 
+    }
   </script>
 </body>
 </html>
