@@ -396,7 +396,9 @@
         };
 
         document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement && document.body.classList.contains('theme-unlocked')) activateFullscreen();
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && document.body.classList.contains('theme-unlocked')) {
+                activateFullscreen();
+            }
         });
 
         inputField.addEventListener('focus', () => {
@@ -406,9 +408,10 @@
             if(document.activeElement === inputField) { termBody.scrollTop = termBody.scrollHeight; inputContainer.scrollIntoView({ behavior: "smooth", block: "center" }); }
         });
 
+        // BUG FIX: Ensure tapping the screen/input doesn't cause fullscreen blackouts if already in fullscreen.
         document.body.addEventListener('click', (e) => { 
             if(e.target.tagName !== "INPUT" && inputContainer.style.display === "flex") inputField.focus(); 
-            if (document.body.classList.contains('theme-unlocked')) activateFullscreen(); 
+            if(e.target.tagName !== "INPUT" && document.body.classList.contains('theme-unlocked')) activateFullscreen(); 
         });
 
         function safeGetLock() { try { return window.localStorage ? window.localStorage.getItem("terminalLockdownTime") : null; } catch(e) { return null; } }
@@ -425,6 +428,9 @@
         });
 
         function activateFullscreen() { 
+            // BUG FIX: Check if we are already in fullscreen mode before requesting it again
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) return;
+            
             const el = document.documentElement; 
             try { if (el.requestFullscreen) el.requestFullscreen().catch(err=>{}); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch (error) {}
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') { DeviceOrientationEvent.requestPermission().catch(e=>{}); }
