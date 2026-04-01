@@ -52,6 +52,11 @@
     }
     .system-blur * { opacity: 0 !important; }
 
+    /* OPTION 9: Custom Hacker Cursor */
+    body, input, .window-btn {
+      cursor: crosshair !important;
+    }
+
     body {
       background: radial-gradient(circle at center, var(--bg-color-2) 0%, var(--bg-color-1) 100%);
       color: var(--text-color); 
@@ -92,6 +97,20 @@
         animation: nebulaPulse 12s infinite alternate ease-in-out; transition: background 2s ease;
     }
     @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.15); } }
+
+    /* OPTION 5: Anime Silhouette Easter Egg */
+    #anime-silhouette {
+        position: fixed; bottom: -5vh; right: -5vw; width: 50vw; height: 70vh;
+        /* Replace this URL with any direct image link of a silhouette or character */
+        background-image: url('https://cdn.pixabay.com/photo/2023/04/08/10/22/anime-7908994_960_720.png'); 
+        background-size: contain; background-repeat: no-repeat; background-position: bottom right;
+        z-index: 1; opacity: 0; transition: opacity 4s ease-in-out, filter 4s ease; pointer-events: none;
+        filter: grayscale(100%) brightness(0) drop-shadow(0 0 10px var(--neon-pink));
+    }
+    body.theme-unlocked #anime-silhouette { 
+        opacity: 0.12; /* Faintly visible */
+        filter: grayscale(100%) brightness(0.5) drop-shadow(0 0 20px var(--neon-pink));
+    }
 
     .cyber-grid {
         position: fixed; bottom: -20vh; left: -100vw; width: 300vw; height: 60vh;
@@ -220,6 +239,7 @@
         background: radial-gradient(circle, #1a0004 0%, #050000 100%);
         display: none; flex-direction: column; justify-content: center; align-items: center;
         z-index: 9999; overflow: hidden; text-align: center;
+        transition: background 0.5s ease;
     }
     #operator-screen::before {
         content: ""; position: absolute; width: 100%; height: 6px; background: rgba(255, 0, 60, 0.4);
@@ -250,6 +270,7 @@
         .input-row { margin-top: 10px; }
         input { padding: 12px 15px; font-size: 14px; }
         .manga-style-text { font-size: 24px; }
+        #anime-silhouette { width: 70vw; height: 50vh; opacity: 0.08; } /* Adjusted for mobile */
     }
   </style>
 </head>
@@ -263,6 +284,8 @@
   <canvas id="star-canvas"></canvas>
   <canvas id="net-canvas"></canvas>
   <div class="scanlines"></div>
+  
+  <div id="anime-silhouette"></div>
   
   <audio id="bg-music" preload="auto" loop><source src="kalapastangan.mp3" type="audio/mpeg"></audio>
 
@@ -408,7 +431,6 @@
             if(document.activeElement === inputField) { termBody.scrollTop = termBody.scrollHeight; inputContainer.scrollIntoView({ behavior: "smooth", block: "center" }); }
         });
 
-        // BUG FIX: Ensure tapping the screen/input doesn't cause fullscreen blackouts if already in fullscreen.
         document.body.addEventListener('click', (e) => { 
             if(e.target.tagName !== "INPUT" && inputContainer.style.display === "flex") inputField.focus(); 
             if(e.target.tagName !== "INPUT" && document.body.classList.contains('theme-unlocked')) activateFullscreen(); 
@@ -428,9 +450,7 @@
         });
 
         function activateFullscreen() { 
-            // BUG FIX: Check if we are already in fullscreen mode before requesting it again
             if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) return;
-            
             const el = document.documentElement; 
             try { if (el.requestFullscreen) el.requestFullscreen().catch(err=>{}); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch (error) {}
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') { DeviceOrientationEvent.requestPermission().catch(e=>{}); }
@@ -456,6 +476,10 @@
           if (step === 0) {
             if (validNames.includes(low)) {
               step++; document.body.classList.add('theme-unlocked'); activateFullscreen();
+              
+              // OPTION 3: Haptic vibration on verified identity
+              if (navigator.vibrate) navigator.vibrate(50);
+
               if (favicon) favicon.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>";
               if (bgMusic) { 
                   forceUnlockAudio();
@@ -514,7 +538,13 @@
             if (i < finalLines.length) {
               let message = finalLines[i]; 
               typeWriter(message + "<br><br>", () => {
-                if(i === finalLines.length - 1) { try { if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); } catch(e) {} }
+                if(i === finalLines.length - 1) { 
+                    try { 
+                        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); 
+                        // OPTION 3: Long double-vibration at the climax
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    } catch(e) {} 
+                }
                 i++; setTimeout(next, 3800); 
               });
             } else {
@@ -527,6 +557,7 @@
                         const c1 = document.getElementById('star-canvas'); if(c1) c1.style.display = 'none';
                         const c2 = document.getElementById('net-canvas'); if(c2) c2.style.display = 'none';
                         const m1 = document.getElementById('matrix-canvas'); if(m1) m1.style.display = 'none';
+                        document.getElementById('anime-silhouette').style.display = 'none';
                         wrapper.style.display = 'none';
                         
                         // 5-SECOND LOCKDOWN ON OPERATOR SCREEN
@@ -544,11 +575,18 @@
                             
                             if (timeLeft <= 0) {
                                 clearInterval(opInterval);
-                                opTimerDisplay.innerText = "SYSTEM UNLOCKED. YOU MAY EXIT.";
-                                opTimerDisplay.style.color = "#00ff66";
-                                opTimerDisplay.style.textShadow = "0 0 20px #00ff66";
-                                document.body.classList.remove('theme-unlocked');
-                                window.onbeforeunload = null; // Release the exit lock
+                                // OPTION 10: SELF-DESTRUCT SEQUENCE
+                                opTimerDisplay.innerText = "SELF-DESTRUCTING...";
+                                opTimerDisplay.style.color = "#ff0000";
+                                opTimerDisplay.style.textShadow = "0 0 30px #ff0000";
+                                document.getElementById('operator-screen').style.background = "#ff0000";
+                                
+                                setTimeout(() => {
+                                    document.body.innerHTML = ""; // Wipe the entire page clean
+                                    document.body.style.backgroundColor = "black";
+                                    window.onbeforeunload = null; // Release the exit lock
+                                    window.close(); // Try to force close the browser tab
+                                }, 800);
                             }
                         }, 1000);
                         
