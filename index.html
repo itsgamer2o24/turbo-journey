@@ -296,8 +296,6 @@
 
   <script>
     // --- MASTER EXECUTION LOCK ---
-    // This absolutely guarantees the code can only run ONE time, 
-    // preventing the "repeating text" glitch on mobile browsers.
     let isAppRunning = false;
 
     function runApp() {
@@ -316,7 +314,7 @@
         if (!historyDiv || !typingTextSpan) return;
 
         let step = 0; let lockdownKeys = false; let typingSpeed = 45; 
-        let isTyping = false; // Secondary lock to prevent overlap during text generation
+        let isTyping = false; 
 
         // --- AUDIO VISUALIZER SETUP ---
         let audioCtx, analyser, dataArray;
@@ -363,7 +361,16 @@
             }
         });
 
-        const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw==", "amVj"];        // EXTREME PRIVACY LOGIC & ANTI-EXIT TRAPS
+        // HIDING NAMES AND MESSAGES VIA BASE64 DECODING (atob)
+        const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw=="];
+        const validNames = _hiddenNames.map(name => atob(name).toLowerCase());
+
+        // Hiding the verification prompts to prevent code snooping
+        const prompt1 = atob("PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gSWRlbnRpdHkgdmVyaWZpZWQuIEhpIDxzcGFuIGNsYXNzPSdnbG93LW5hbWUnPkthdGg8L3NwYW4+LCB0aGVyZSBpcyBzb21ldGhpbmcgSSB3YW50IHRvIHNoYXJlIHdpdGggeW91LiBQcm9jZWVkPyAoeWVzL25vKTog");
+        const prompt2 = atob("PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gQXJlIHlvdSBhYnNvbHV0ZWx5IHN1cmUgd2FudCB0byBwcm9jZWVkLCA8c3BhbiBjbGFzcz0nZ2xvdy1uYW1lJz5LYXRoPC9zcGFuPj8gKHllcy9ubyk6IA==");
+        const prompt3 = atob("PHNwYW4gY2xhc3M9J2dsb3ctamVjJz5bSmVjXTwvc3Bhbj4gQmFnbyBtbyBtYWJhc2EsIHByb21pc2UgbW8gbXVuYSBuYSBub3JtYWwgbGFuZyB0YXlvIHBhZ2thdGFwb3Mgbml0byBoYT8gUGF5YWcga2EgYmE/ICh5ZXMvbm8pOiA=");
+
+        // EXTREME PRIVACY LOGIC & ANTI-EXIT TRAPS
         const applyBlur = () => document.body.classList.add('system-blur');
         const removeBlur = () => document.body.classList.remove('system-blur');
         
@@ -450,26 +457,24 @@
                   if (playPromise !== undefined) { playPromise.then(() => { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }).catch(e=>{}); }
               }
               lockdownKeys = true; 
-              setTimeout(() => typeWriter("<span class='glow-sys'>[System]</span> Identity verified. Hi <span class='glow-name'>Kath</span>, there is something I want to share with you. Proceed? (yes/no): ", showInput), 800);
+              setTimeout(() => typeWriter(prompt1, showInput), 800);
             } else triggerLockdown();
           } else if (step === 1) {
             if (low === 'yes' || low === 'y') {
-              step++; typeWriter("<span class='glow-sys'>[System]</span> Are you absolutely sure want to proceed, <span class='glow-name'>Kath</span>? (yes/no): ", showInput);
+              step++; typeWriter(prompt2, showInput);
             } else location.reload();
           } else if (step === 2) {
             if (low === 'yes' || low === 'y') {
-              step++; typeWriter("<span class='glow-jec'>[Jec]</span> Bago mo mabasa, promise mo muna na normal lang tayo pagkatapos nito ha? Payag ka ba? (yes/no): ", showInput);
+              step++; typeWriter(prompt3, showInput);
             } else location.reload();
           } else if (step === 3) {
             if (low === 'yes' || low === 'y') {
               step++; sendToDiscord("Kath accepted agreement."); historyDiv.innerHTML = ""; 
               
-              // EXACT TEXT PRESERVED
-              let introMsg = "<span class='glow-sys'>[System]</span> Reminder on outside that be a English word( on inside the be a Tagalog word)<br>";
-              introMsg += " - Ex. A hello this is the example. (Hello ito ang halimbawa.)<br><br>";
-              introMsg += "<span class='glow-sys'>[System]</span> Message ito ni <span class='glow-jec'>Jec</span>, <span class='glow-name'>Kath</span><br><br>";
-
-              typeWriter(introMsg, () => { typingSpeed = 85; setTimeout(playFinal, 1500); });
+              // Base64 Encoded Intro Message to hide it
+              let introEncoded = "PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gUmVtaW5kZXIgb24gb3V0c2lkZSB0aGF0IGJlIGEgRW5nbGlzaCB3b3JkKCBvbiBpbnNpZGUgdGhlIGJlIGEgVGFnYWxvZyB3b3JkKTxicj4gLSBFeC4gQSBoZWxsbyB0aGlzIGlzIHRoZSBleGFtcGxlLiAoSGVsbG8gaXRvIGFuZyBoYWxpbWJhd2EuKTxicj48YnI+PHNwYW4gY2xhc3M9J2dsb3ctc3lzJz5bU3lzdGVtXTwvc3Bhbj4gTWVzc2FnZSBpdG8gbmkgPHNwYW4gY2xhc3M9J2dsb3ctamVjJz5KZWM8L3NwYW4+LCA8c3BhbiBjbGFzcz0nZ2xvdy1uYW1lJz5LYXRoPC9zcGFuPjxicj48YnI+";
+              
+              typeWriter(atob(introEncoded), () => { typingSpeed = 85; setTimeout(playFinal, 1500); });
             } else location.reload();
           }
         }
@@ -480,19 +485,23 @@
         }
 
         function playFinal() {
-          const finalLines = [
-            "Actually, I've been wanting to tell you this for a long time... (Sa totoo lang, matagal ko nang gustong sabihin ito sa iyo...)",
-            "I know you'll be in Grade 11 at your next school, I'm only in Grade 10. (Alam kong Grade 11 ka na sa next school mo, Grade 10 pa lang ako.)",
-            "With every chat and 'hello' we say, I get to know you better. (Sa bawat chat at 'hello' na sinasabi natin, mas nakikilala kita.)",
-            "I call you, I always say boy first sorry about that. (I call you, lagi kong sinasabi boy first sorry about that.)",
-            "I love you ML, I want to play you a lot so I can get to know you. (I love you ML, I want to play you a lot para makilala kita.)",
-            "We are the same you like anime to and manga. (Pareho tayo ng gusto mo ng anime at manga.)",
-            "You're not just a person I talk to, you're someone who genuinely makes my day. (Hindi lang ikaw ang taong kausap ko, isa kang tunay na bumubuo ng araw ko.)",
-            "I value every second of our conversation, especially our laughter. (Pinahahalagahan ko ang bawat segundo ng aming pag-uusap, lalo na ang aming mga tawanan.)",
-            "I want to say more, I can not now I wnat to know more, That all massage only last three months (Gusto kong sabihin ang higit pa, hindi ko na ngayon wnat malaman pa, Na ang lahat ng masahe ay tatagal lamang ng tatlong buwan)",
-            "<span style='color:var(--accent-pink); letter-spacing:5px;'>- - - - - - - -</span>",
-            "<span class='manga-style-text'>I really like you, Good luck sa Grade 11 journey mo! <span class='heart-glow'>&hearts;</span></span>"
+          // Encoded messages so they cannot be read in the source code
+          const encodedLines = [
+            "QWN0dWFsbHksIEkndmUgYmVlbiB3YW50aW5nIHRvIHRlbGwgeW91IHRoaXMgZm9yIGEgbG9uZyB0aW1lLi4uIChTYSB0b3RvbyBsYW5nLCBtYXRhZ2FsIGtvIG5hbmcgZ3VzdG9uZyBzYWJpaGluIGl0byBzYSBpeW8uLi4p",
+            "SSBrbm93IHlvdSdsbCBiZSBpbiBHcmFkZSAxMSBhdCB5b3VyIG5leHQgc2Nob29sLCBJJ20gb25seSBpbiBHcmFkZSAxMC4gKEFsYW0ga29uZyBHcmFkZSAxMSBrYSBuYSBzYSBuZXh0IHNjaG9vbCBtbywgR3JhZGUgMTAgcGEgbGFuZyBha28uKQ==",
+            "V2l0aCBldmVyeSBjaGF0IGFuZCAnaGVsbG8nIHdlIHNheSwgSSBnZXQgdG8ga25vdyB5b3UgYmV0dGVyLiAoU2EgYmF3YXQgY2hhdCBhdCAnaGVsbG8nIG5hIHNpbmFzYWJpIG5hdGluLCBtYXMgbmFraWtpbGFsYSBraXRhLik=",
+            "SSBjYWxsIHlvdSwgSSBhbHdheXMgc2F5IGJveSBmaXJzdCBzb3JyeSBhYm91dCB0aGF0LiAoSSBjYWxsIHlvdSwgbGFnaSBrb25nIHNpbmFzYWJpIGJveSBmaXJzdCBzb3JyeSBhYm91dCB0aGF0Lik=",
+            "SSBsb3ZlIHlvdSBNTCwgSSB3YW50IHRvIHBsYXkgeW91IGEgbG90IHNvIEkgY2FuIGdldCB0byBrbm93IHlvdS4gKEkgbG92ZSB5b3UgTUwsIEkgd2FudCB0byBwbGF5IHlvdSBhIGxvdCBwYXJhIG1ha2lsYWxhIGtpdGEuKQ==",
+            "V2UgYXJlIHRoZSBzYW1lIHlvdSBsaWtlIGFuaW1lIHRvIGFuZCBtYW5nYS4gKFBhcmVobyB0YXlvIG5nIGd1c3RvIG1vIG5nIGFuaW1lIGF0IG1hbmdhLik=",
+            "WW91J3JlIG5vdCBqdXN0IGEgcGVyc29uIEkgdGFsayB0bywgeW91J3JlIHNvbWVvbmUgd2hvIGdlbnVpbmVseSBtYWtlcyBteSBkYXkuIChIaW5kaSBsYW5nIGlrYXcgYW5nIHRhb25nIGthdXNhcCBrbywgaXNhIGthbmcgdHVuYXkgbmEgYnVtdWJ1byBuZyBhcmF3IGtvLik=",
+            "SSB2YWx1ZSBldmVyeSBzZWNvbmQgb2Ygb3VyIGNvbnZlcnNhdGlvbiwgZXNwZWNpYWxseSBvdXIgbGF1Z2h0ZXIuIChQaW5haGFoYWxhZ2FoYW4ga28gYW5nIGJhd2F0IHNlZ3VuZG8gbmcgYW1pbmcgcGFnLXV1c2FwLCBsYWxvIG5hIGFuZyBhbWluZyBtZ2EgdGF3YW5hbi4p",
+            "SSB3YW50IHRvIHNheSBtb3JlLCBJIGNhbiBub3Qgbm93IEkgd25hdCB0byBrbm93IG1vcmUsIFRoYXQgYWxsIG1hc3NhZ2Ugb25seSBsYXN0IHRocmVlIG1vbnRocyAoR3VzdG8ga29uZyBzYWJpaGluIGFuZyBoaWdpdCBwYSwgaGluZGkga28gbmEgbmdheW9uIHduYXQgbWFsYW1hbiBwYSwgTmEgYW5nIGxhaGF0IG5nIG1hc2FoZSBheSB0YXRhZ2FsIGxhbWFuZyBuZyB0YXRsb25nIGJ1d2FuKQ==",
+            "PHNwYW4gc3R5bGU9J2NvbG9yOnZhcigtLWFjY2VudC1waW5rKTsgbGV0dGVyLXNwYWNpbmc6NXB4Oyc+LSAtIC0gLSAtIC0gLSAtPC9zcGFuPg==",
+            "PHNwYW4gY2xhc3M9J21hbmdhLXN0eWxlLXRleHQnPkkgcmVhbGx5IGxpa2UgeW91LCBHb29kIGx1Y2sgc2EgR3JhZGUgMTEgam91cm5leSBtbyEgPHNwYW4gY2xhc3M9J2hlYXJ0LWdsb3cnPiZoZWFydHM7PC9zcGFuPjwvc3Bhbj4="
           ];
+
+          // Decode back to normal strings behind the scenes using atob
+          const finalLines = encodedLines.map(line => atob(line));
           
           let i = 0;
           function next() {
