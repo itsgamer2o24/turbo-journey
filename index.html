@@ -363,11 +363,7 @@
             }
         });
 
-        const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw==", "amVj"];
-        let validNames = [];
-        try { validNames = _hiddenNames.map(n => atob(n)); } catch(e) { validNames = ["kath", "cath", "jec"]; }
-
-        // EXTREME PRIVACY LOGIC & ANTI-EXIT TRAPS
+        const _hiddenNames = ["a2F0aA==", "Y2F0aA==", "Y2F0aHlseW4gbmFjYXJpbw==", "Y2F0aHlseW4gbHVjYXMgbmFjYXJpbw==", "Y2F0aHlseW4gbC4gbmFjYXJpbw==", "amVj"];        // EXTREME PRIVACY LOGIC & ANTI-EXIT TRAPS
         const applyBlur = () => document.body.classList.add('system-blur');
         const removeBlur = () => document.body.classList.remove('system-blur');
         
