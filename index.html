@@ -24,7 +24,7 @@
       --nebula-color: rgba(0, 229, 255, 0.04);
       --grid-color: rgba(0, 229, 255, 0.15);
       
-      --term-bg: rgba(7, 7, 12, 0.75); 
+      --term-bg: rgba(10, 12, 20, 0.65); 
       --text-color: #e0e0e0; 
       
       --neon-cyan: #00e5ff;
@@ -44,6 +44,7 @@
         --accent-green: var(--neon-pink); 
     }
 
+    /* EXTREME PRIVACY BLUR */
     .system-blur {
         filter: blur(80px) brightness(0.0) grayscale(100%) !important;
         transition: filter 0.1s ease;
@@ -62,6 +63,7 @@
       perspective: 1000px; 
     }
 
+    /* PRIVACY SHIELD BLACKOUT */
     #privacy-shield {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background-color: #000000; z-index: 9999999; opacity: 0; pointer-events: none;
@@ -79,11 +81,13 @@
         opacity: 0 !important; transition: filter 0.05s, opacity 0.05s;
     }
 
+    /* MATRIX DIGITAL RAIN */
     #matrix-canvas {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 0; pointer-events: none; opacity: 0.25; display: block;
     }
 
+    /* NEBULA */
     .nebula {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: radial-gradient(circle at 20% 30%, var(--nebula-color) 0%, transparent 50%),
@@ -93,6 +97,7 @@
     }
     @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.15); } }
 
+    /* 3D CYBER GRID */
     .cyber-grid {
         position: fixed; bottom: -10%; left: -50%; width: 200%; height: 45vh;
         background: linear-gradient(var(--grid-color) 1px, transparent 1px),
@@ -103,6 +108,7 @@
     }
     @keyframes gridMove { 0% { transform: perspective(600px) rotateX(70deg) translateY(0); } 100% { transform: perspective(600px) rotateX(70deg) translateY(40px); } }
 
+    /* CRT SCANLINES */
     .scanlines {
         position: fixed; top: -25%; left: -25%; width: 150vw; height: 150vh; 
         background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15));
@@ -115,8 +121,13 @@
     }
     #net-canvas { opacity: 0.7; }
 
+    #speed-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; opacity: 0; transition: opacity 2.5s ease;}
+    body.theme-unlocked #speed-lines { opacity: 1; animation: focusPulse 3s infinite alternate ease-in-out; }
+    @keyframes focusPulse { 0% { box-shadow: inset 0 0 50px rgba(255,102,178,0.05); } 100% { box-shadow: inset 0 0 150px rgba(255,102,178,0.15); } }
+
     .terminal-container { position: relative; z-index: 10; animation: entrance 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform; }
 
+    /* AUDIO-REACTIVE BORDER */
     .terminal-container::before {
         content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
         background: linear-gradient(45deg, var(--accent-blue), transparent 30%, transparent 70%, var(--accent-pink));
@@ -128,13 +139,14 @@
     body.theme-unlocked .terminal-container::before { background: linear-gradient(45deg, var(--accent-pink), transparent 30%, transparent 70%, #fff); }
     @keyframes borderRotate { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
+    /* REFINED TERMINAL UI */
     .terminal-wrapper {
-      width: 90vw; max-width: 800px; height: 80dvh;
+      width: 92vw; max-width: 800px; height: 82dvh;
       background: var(--term-bg); border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.9), inset 0 0 calc(20px + (var(--audio-pulse) * 60px)) rgba(0, 229, 255, calc(0.05 + (var(--audio-pulse) * 0.2)));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 calc(20px + (var(--audio-pulse) * 60px)) rgba(0, 229, 255, calc(0.05 + (var(--audio-pulse) * 0.2)));
       display: flex; flex-direction: column;
-      backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
+      backdrop-filter: blur(35px) saturate(200%); -webkit-backdrop-filter: blur(35px) saturate(200%);
       transition: box-shadow 0.1s ease; animation: levitate 6s ease-in-out infinite alternate;
       position: relative; overflow: hidden;
     }
@@ -145,96 +157,109 @@
         animation: scanlineSweep 5s linear infinite; pointer-events: none; z-index: 20;
     }
     @keyframes scanlineSweep { 0% { top: -20%; } 100% { top: 120%; } }
-    @keyframes levitate { 0% { transform: translateY(0px); } 100% { transform: translateY(-15px); } }
+    @keyframes levitate { 0% { transform: translateY(0px); } 100% { transform: translateY(-12px); } }
 
     body.theme-unlocked .terminal-wrapper {
         border: 1px solid rgba(255, 102, 178, 0.3);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.9), inset 0 0 calc(30px + (var(--audio-pulse) * 80px)) rgba(255, 102, 178, calc(0.1 + (var(--audio-pulse) * 0.25)));
+        box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 calc(30px + (var(--audio-pulse) * 80px)) rgba(255, 102, 178, calc(0.1 + (var(--audio-pulse) * 0.25)));
     }
 
     .terminal-close-anim { animation: smoothClose 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; }
-    @keyframes smoothClose { 0% { transform: scale(1); filter: blur(0px); opacity: 1; } 100% { transform: scale(0.8); filter: blur(40px); opacity: 0; } }
+    @keyframes smoothClose { 0% { transform: scale(1); filter: blur(0px); opacity: 1; } 100% { transform: scale(0.85); filter: blur(40px); opacity: 0; } }
 
     @keyframes entrance { 
-        0% { transform: scale(0.9) translateY(40px); opacity: 0; filter: contrast(2) brightness(2) hue-rotate(90deg); } 
+        0% { transform: scale(0.95) translateY(30px); opacity: 0; filter: contrast(2) brightness(2) hue-rotate(90deg); } 
         50% { filter: contrast(1) brightness(1) hue-rotate(0deg); }
         70% { transform: scale(1.02); }
         100% { transform: scale(1) translateY(0); opacity: 1; } 
     }
 
-    .glow-sys { color: var(--accent-green); text-shadow: 0 0 10px var(--accent-green); font-weight: 700; }
-    .glow-jec { color: var(--accent-blue); text-shadow: 0 0 12px var(--accent-blue); font-weight: 700; }
-    .glow-name { color: var(--accent-pink); text-shadow: 0 0 12px var(--accent-pink); font-weight: 700;}
+    .glow-sys { color: var(--accent-green); text-shadow: 0 0 8px rgba(0, 255, 102, 0.6); font-weight: 700; }
+    .glow-jec { color: var(--accent-blue); text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); font-weight: 700; }
+    .glow-name { color: var(--accent-pink); text-shadow: 0 0 10px rgba(255, 102, 178, 0.6); font-weight: 700;}
 
-    .window-btn { width: 13px; height: 13px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 0 10px rgba(0,0,0,0.5); }
+    .window-btn { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 0 8px rgba(0,0,0,0.6); }
 
     .terminal-body { 
-        padding: 25px; flex-grow: 1; overflow-y: auto; font-size: 16px; 
-        line-height: 1.6; scrollbar-width: none; -ms-overflow-style: none;
+        padding: 30px; flex-grow: 1; overflow-y: auto; font-size: 16px; 
+        line-height: 1.7; scrollbar-width: none; -ms-overflow-style: none;
         word-wrap: break-word; z-index: 5; position: relative;
+        text-shadow: 0 0 2px rgba(255,255,255,0.1);
     }
     .terminal-body::-webkit-scrollbar { display: none; }
     
     #console-history, #active-line { display: inline; }
 
     #cursor {
-        display: inline-block; width: 10px; height: 1.2rem; background: var(--accent-green); 
-        box-shadow: 0 0 10px var(--accent-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 4px;
-        transition: background 1.5s, box-shadow 1.5s;
+        display: inline-block; width: 10px; height: 1.1rem; background: var(--accent-green); 
+        box-shadow: 0 0 10px var(--accent-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;
+        transition: background 1.5s, box-shadow 1.5s; margin-bottom: 2px;
     }
     body.theme-unlocked #cursor { background: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    .input-row { display: flex; align-items: center; margin-top: 15px; margin-bottom: 15px; display: none; }
-    .input-arrow { color: var(--accent-green); font-weight: bold; margin-right: 12px; }
+    /* PERFECTED INPUT UI */
+    .input-row { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; display: none; }
+    .input-arrow { color: var(--accent-green); font-weight: bold; margin-right: 15px; font-size: 18px; text-shadow: 0 0 8px var(--accent-green); }
     
     input { 
-        background: rgba(0,0,0,0.6); padding: 12px 18px; border-radius: 8px; 
-        border: 1px solid rgba(255,255,255,0.1); color: #ffffff; 
-        font-family: 'JetBrains Mono'; font-size: 16px; outline: none; 
-        flex-grow: 1; font-weight: 700; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); transition: border 0.3s;
+        background: rgba(0,0,0,0.5); padding: 14px 20px; border-radius: 10px; 
+        border: 1px solid rgba(255,255,255,0.15); color: #ffffff; 
+        font-family: 'JetBrains Mono', monospace; font-size: 16px; outline: none; 
+        flex-grow: 1; font-weight: 700; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); 
+        transition: all 0.3s ease; letter-spacing: 0.5px;
     }
-    input:focus { border: 1px solid var(--accent-green); box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 0 15px rgba(0,255,102,0.2); }
-    body.theme-unlocked input:focus { border: 1px solid var(--accent-pink); box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 0 15px rgba(255,102,178,0.2); }
+    input:focus { border: 1px solid var(--accent-green); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 15px rgba(0,255,102,0.3); background: rgba(0,0,0,0.7); }
+    body.theme-unlocked input:focus { border: 1px solid var(--accent-pink); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 15px rgba(255,102,178,0.3); }
+    input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; font-style: italic; }
 
     .manga-style-text {
-      font-family: 'Playfair Display', serif; font-size: 30px; color: #ffb3d9; 
+      font-family: 'Playfair Display', serif; font-size: 28px; color: #ffb3d9; 
       text-shadow: 0 0 15px rgba(255,102,178,0.9), 0 0 30px rgba(255,102,178,0.6);
       margin-top: 25px; display: inline-block; font-style: italic; font-weight: 800;
-      animation: mangaGlow 2.5s infinite alternate;
+      animation: mangaGlow 2.5s infinite alternate; line-height: 1.4;
     }
-    @keyframes mangaGlow { 0% { text-shadow: 0 0 15px rgba(255,102,178,0.7); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(255,102,178,1), 0 0 50px rgba(255,255,255,0.6); transform: scale(1.03); } }
-    .heart-glow { color: #ff3366; animation: heartbeat 1.2s infinite; display: inline-block; }
+    @keyframes mangaGlow { 0% { text-shadow: 0 0 15px rgba(255,102,178,0.7); transform: scale(1); } 100% { text-shadow: 0 0 30px rgba(255,102,178,1), 0 0 50px rgba(255,255,255,0.6); transform: scale(1.02); } }
+    .heart-glow { color: #ff3366; animation: heartbeat 1.2s infinite; display: inline-block; margin-left: 5px; }
     @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
 
     /* FINAL OPERATOR SCREEN + TIMER */
     #operator-screen {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: radial-gradient(circle, #2a0005 0%, #050000 100%);
+        background: radial-gradient(circle, #1a0004 0%, #050000 100%);
         display: none; flex-direction: column; justify-content: center; align-items: center;
         z-index: 9999; overflow: hidden; text-align: center;
     }
     #operator-screen::before {
-        content: ""; position: absolute; width: 100%; height: 5px; background: rgba(255, 0, 60, 0.5);
-        animation: scanline 3s linear infinite; box-shadow: 0 0 20px var(--alert-red);
+        content: ""; position: absolute; width: 100%; height: 6px; background: rgba(255, 0, 60, 0.4);
+        animation: scanline 3s linear infinite; box-shadow: 0 0 25px var(--alert-red);
     }
     @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
     .operator-text {
-        font-family: 'Share Tech Mono', monospace; color: var(--alert-red); font-size: 24px;
-        text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 15px var(--alert-red);
-        animation: glitchWarning 0.1s infinite alternate; width: 90%;
+        font-family: 'Share Tech Mono', monospace; color: var(--alert-red); font-size: 26px;
+        text-transform: uppercase; letter-spacing: 4px; text-shadow: 0 0 15px var(--alert-red);
+        animation: glitchWarning 0.1s infinite alternate; width: 90%; margin-bottom: 20px;
     }
     #operator-timer-display {
-        font-family: 'Share Tech Mono', monospace; font-size: 40px; color: #ff003c;
-        margin-top: 30px; text-shadow: 0 0 20px #ff003c; letter-spacing: 5px;
+        font-family: 'Share Tech Mono', monospace; font-size: 50px; color: #ff003c;
+        text-shadow: 0 0 25px #ff003c; letter-spacing: 6px; font-weight: bold;
+        transition: all 0.5s ease;
     }
-    @keyframes glitchWarning { 0% { transform: translate(2px, 1px); opacity: 0.8; } 100% { transform: translate(-2px, -1px); opacity: 1; text-shadow: 0 0 25px #ff0000; } }
+    @keyframes glitchWarning { 0% { transform: translate(2px, 1px); opacity: 0.85; } 100% { transform: translate(-2px, -1px); opacity: 1; text-shadow: 0 0 30px #ff0000; } }
 
     .lockdown-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;}
     .lockdown-overlay.active { opacity: 1; pointer-events: all; }
     #timer { font-family: 'Share Tech Mono'; font-size: 4rem; color: #ff3b30; text-shadow: 0 0 20px #ff3b30; }
 
-    @media (max-width: 600px) { .terminal-wrapper { width: 92vw; height: 85dvh; } .terminal-body { padding: 20px; font-size: 15px;} .operator-text { font-size: 18px; } #operator-timer-display { font-size: 30px; } }
+    @media (max-width: 600px) { 
+        .terminal-wrapper { width: 94vw; height: 86dvh; } 
+        .terminal-body { padding: 20px; font-size: 15px; } 
+        .operator-text { font-size: 18px; } 
+        #operator-timer-display { font-size: 35px; } 
+        .input-row { margin-top: 10px; }
+        input { padding: 12px 15px; font-size: 14px; }
+        .manga-style-text { font-size: 24px; }
+    }
   </style>
 </head>
 <body>
@@ -251,26 +276,26 @@
   <audio id="bg-music" preload="auto" loop><source src="kalapastangan.mp3" type="audio/mpeg"></audio>
 
   <div id="operator-screen">
-      <h1 style="color:#ff003c; font-family:'Share Tech Mono'; margin-bottom:10px; font-size: 50px; text-shadow: 0 0 20px #ff003c; margin-top:0;">/// SYSTEM OVERRIDE ///</h1>
+      <h1 style="color:#ff003c; font-family:'Share Tech Mono'; margin-bottom:10px; font-size: 50px; text-shadow: 0 0 25px #ff003c; margin-top:0;">/// SYSTEM OVERRIDE ///</h1>
       <span class="operator-text">The message was auto hidden by an Operator</span>
       <div id="operator-timer-display">00:05</div>
   </div>
 
   <div class="terminal-container" id="terminal-ui">
       <div class="terminal-wrapper">
-        <div class="window-header" style="background: rgba(0,0,0,0.6); padding: 14px 25px; border-radius: 20px 20px 0 0; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 10;">
-          <div style="display: flex; gap: 8px;">
+        <div class="window-header" style="background: rgba(0,0,0,0.5); padding: 14px 25px; border-radius: 20px 20px 0 0; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10;">
+          <div style="display: flex; gap: 9px;">
             <div class="window-btn" style="background:#ff5f56;"></div>
             <div class="window-btn" style="background:#ffbd2e;"></div>
             <div class="window-btn" style="background:#27c93f;"></div>
           </div>
-          <div style="flex-grow:1; text-align:right; font-size:10px; letter-spacing:3px; opacity:0.5; margin-top: -12px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">SECURE_HOST_7.1</div>
+          <div style="flex-grow:1; text-align:right; font-size:11px; letter-spacing:4px; opacity:0.4; margin-top: -12px; text-shadow: 0 0 5px rgba(255,255,255,0.5); font-weight: bold;">SECURE_HOST_7.1</div>
         </div>
         <div class="terminal-body" id="term-body">
           <span id="console-history"></span><span id="active-line"><span id="typing-text"></span><span id="cursor"></span></span>
           <div class="input-row" id="input-container">
             <span class="input-arrow">~ $</span>
-            <input type="text" id="user-input" autocomplete="off" spellcheck="false" placeholder="Authorized user only...">
+            <input type="text" id="user-input" autocomplete="off" spellcheck="false" placeholder="Awaiting input...">
           </div>
         </div>
       </div>
@@ -279,14 +304,12 @@
   <div class="lockdown-overlay" id="lock-screen"><div id="timer">00:00:00</div></div>
 
   <script>
-    // BULLETPROOF BOOTLOADER FOR ZARCHIVER / ANDROID
     function bootloader() {
         if (window.appBooted) return;
         window.appBooted = true;
         runApp();
     }
     
-    // Safely wait for screen dimensions before booting
     setTimeout(() => {
         if (document.readyState === 'complete' || document.readyState === 'interactive') { bootloader(); } 
         else { document.addEventListener('DOMContentLoaded', bootloader); window.addEventListener('load', bootloader); }
@@ -506,7 +529,7 @@
                         const m1 = document.getElementById('matrix-canvas'); if(m1) m1.style.display = 'none';
                         wrapper.style.display = 'none';
                         
-                        // NEW FEATURE: 5-SECOND LOCKDOWN ON OPERATOR SCREEN
+                        // 5-SECOND LOCKDOWN ON OPERATOR SCREEN
                         document.getElementById('operator-screen').style.display = 'flex';
                         document.body.style.background = '#000000';
                         
@@ -523,7 +546,7 @@
                                 clearInterval(opInterval);
                                 opTimerDisplay.innerText = "SYSTEM UNLOCKED. YOU MAY EXIT.";
                                 opTimerDisplay.style.color = "#00ff66";
-                                opTimerDisplay.style.textShadow = "0 0 15px #00ff66";
+                                opTimerDisplay.style.textShadow = "0 0 20px #00ff66";
                                 document.body.classList.remove('theme-unlocked');
                                 window.onbeforeunload = null;
                             }
@@ -569,7 +592,7 @@
           type();
         }
 
-        // --- MATRIX RAIN LOGIC (FIXED RESIZE CUTOFF) ---
+        // --- MATRIX RAIN LOGIC ---
         const matrixCanvas = document.getElementById('matrix-canvas');
         const mCtx = matrixCanvas ? matrixCanvas.getContext('2d') : null;
         let matrixDrops = [];
